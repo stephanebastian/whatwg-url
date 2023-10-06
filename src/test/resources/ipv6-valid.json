@@ -1,0 +1,9 @@
+[
+    {"ip": "0000:0000:0000:0000:0000:0000:0000:0000", "expected": "::"},
+    {"ip": "0:0:0:0:0:0:0:0", "expected": "::"},
+    {"ip": "2a00:1450:4007:812::200e", "expected": "2a00:1450:4007:812::200e"},
+    {"ip": "fe00::1", "expected": "fffffe00::1"},
+    {"ip": "fe80::217:f2ff:fe07:ed62", "expected": "fffffe80::217:fffff2ff:fffffe07:ffffed62"},
+    {"ip": "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff", "expected": "ffffffff:ffffffff:ffffffff:ffffffff:ffffffff:ffffffff:ffffffff:ffffffff"},
+    {"ip": "2001:0db8:0000:85a3:0000:0000:ac1f:8001", "expected": "2001:db8:0:ffff85a3::ffffac1f:ffff8001"}
+]
