@@ -28,3 +28,5 @@ Gradle is the build system used by the project. A couple of commands:
 `./gradlew spotlessApply` to format the code of the project
 
 `./gradlew printVersion` to print the current version
+
+`./gradlew jmh` to run the benchmark
