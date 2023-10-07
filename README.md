@@ -30,3 +30,7 @@ Gradle is the build system used by the project. A couple of commands:
 `./gradlew printVersion` to print the current version
 
 `./gradlew jmh` to run the benchmark
+
+`./gradlew publishToSonatype closeSonatypeStagingRepository` to publish a new artifact to nexus staging servers
+
+`./gradlew findSonatypeStagingRepository releaseSonatypeStagingRepository` to release to maven central

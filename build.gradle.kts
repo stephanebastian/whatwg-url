@@ -20,7 +20,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
-group = "com.stephanebastian"
+group = "io.github.stephanebastian"
+// get the version (based on the palantir plugin)
 val gitVersion: groovy.lang.Closure<String> by extra
 version = gitVersion()
 
