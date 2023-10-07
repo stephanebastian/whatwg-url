@@ -5,24 +5,21 @@ import io.github.stephanebastian.whatwg.url.impl.UrlImpl;
 import java.util.function.Consumer;
 
 /**
- * <pre>
- *   This is the main interface of the project. It closely follows
- *   <a href="https://url.spec.whatwg.org/#url-class">the URL interface defined by the WhatWg
- *   specification</a>. </br>
+ * This is the main interface of the project. It closely follows
+ * <a href="https://url.spec.whatwg.org/#url-class">the URL interface defined by the WhatWg
+ * specification</a>.<br/>
+ * <br/>
+ * To get an instance of a URL you can:
+ * <ul>
+ *   <li>Create a blank new url by calling UrlBuilder.create()</li>
+ *   <li>Create a url from a string url by calling UrlBuilder.create("http://www.myurl.com")</li>
+ *   <li>Create a url from a string url and a base Url by calling
+ *   UrlBuilder.create("http://www.myurl.com", "http://www.mybaseurl.com")</li>
+ *   <li>Create a url from a string url and a base Url as well as an error handler by calling
+ *   UrlBuilder.create("http://www.myurl.com", "http://www.mybaseurl.com",
+ *   error -&gt; {// do something with the error})</li>
+ * </ul>
  *
- *   </br>
- *   To get an instance of a URL you can:
- *   <ul>
- *     <li>Create a blank new url by calling UrlBuilder.create()</li>
- *     <li>Create a url from a string url by calling UrlBuilder.create("http://www.myurl.com")</li>
- *     <li>Create a url from a string url and a base Url by calling
- *     UrlBuilder.create("http://www.myurl.com", "http://www.mybaseurl.com")</li>
- *     <li>Create a url from a string url and a base Url as well as an error handler by calling
- *     UrlBuilder.create("http://www.myurl.com", "http://www.mybaseurl.com",
- *     error -> {// do something with the error})</li>
- *   </ul>
- * </pre>
- * 
  * @author <a href="mail://stephane.bastian.dev@gmail.com">Stephane Bastian</a>
  */
 public interface Url {
@@ -38,7 +35,7 @@ public interface Url {
   /**
    * Create a new Url from the specified input
    *
-   * @param input
+   * @param input the input to parse and create an Url from
    * @return a new Url
    */
   static Url create(String input) {
@@ -48,6 +45,8 @@ public interface Url {
   /**
    * Create a new Url from the specified input and base url
    *
+   * @param input the input to parse and create an Url from
+   * @param baseUrl the base url
    * @return a new Url
    */
   static Url create(String input, String baseUrl) {
@@ -58,7 +57,10 @@ public interface Url {
    * Create a new Url from the specified input, base url and error handler. <br/>
    * Note that this method is not defined by the spec but provide an easy way <br/>
    * of reporting potential errors
-   * 
+   *
+   * @param input the input to parse and create an Url from
+   * @param baseUrl the base url
+   * @param errorHandler the error handler to register
    * @return new Url
    */
   static Url create(String input, String baseUrl, Consumer<String> errorHandler) {

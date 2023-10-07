@@ -23,6 +23,9 @@ public class EncodingHelper {
    *     <li>2) Return output.</li>
    *   </ul>
    * </pre>
+   *
+   * @param input the input to decode
+   * @return the decoded input as a string
    */
   public static String utf8DecodeWithoutBom(byte[] input) {
     StringBuilder result = new StringBuilder();

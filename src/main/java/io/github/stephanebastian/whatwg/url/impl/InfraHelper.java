@@ -11,27 +11,25 @@ import java.util.function.IntPredicate;
 
 public class InfraHelper {
   /**
-   * <pre>
-   *   To collect a sequence of code points meeting a condition condition from a
-   *   string input, given a position variable position tracking the position of
-   *   the calling algorithm within input:
-   *   <ul>
-   *     <li>1) Let result be the empty string.</li>
-   *     <li>2) While position doesn’t point past the end of input and the code point
-   *     at position within input meets the condition condition:
-   *       <ul>
-   *         <li>2.1) Append that code point to the end of result.</li>
-   *         <li>2.2) Advance position by 1.</li>
-   *       </ul>
-   *     </li>
-   *     <li>3) Return result.</li>
-   *   </ul>
-   * </pre>
+   * To collect a sequence of code points meeting a condition condition from a
+   * string input, given a position variable position tracking the position of
+   * the calling algorithm within input:
+   * <ul>
+   *   <li>1) Let result be the empty string.</li>
+   *   <li>2) While position doesn’t point past the end of input and the code point
+   *   at position within input meets the condition condition:
+   *     <ul>
+   *       <li>2.1) Append that code point to the end of result.</li>
+   *       <li>2.2) Advance position by 1.</li>
+   *     </ul>
+   *   </li>
+   *   <li>3) Return result.</li>
+   * </ul>
    *
-   * @param input
-   * @param position
-   * @param condition
-   * @return
+   * @param input the input
+   * @param position the position to start collecting codepoints
+   * @param condition a lambda indicating whether a given codepoint should be collected
+   * @return a string representation of all collected codepoints
    */
   public static String collectCodePoints(String input, int position, IntPredicate condition) {
     // 1
@@ -98,51 +96,47 @@ public class InfraHelper {
   }
 
   /**
-   * <pre>
-   *   doEncode is equivalent to processQueue/ProcessItem whose algorithm are described below.
-   *   It does its job and call the resultHandler whenever
-   *
-   *   <br/>
-   *   </br/>ProcessQueue:
-   *   To encode an I/O queue of scalar values ioQueue given an encoding encoding
-   *   and an optional I/O queue of bytes output (default « »), run these steps:
-   *   <ul>
-   *     <li>1) Let encoder be the result of getting an encoder from encoding.</li>
-   *     <li>2) Process a queue with encoder, ioQueue, output, and "html".</li>
-   *     <li>3) Return output.</li>
-   *   </ul>
-   *
-   *   <br/>
-   *   </br/>ProcessItem:
-   *   To process an item given an item item, encoding’s encoder or decoder
-   *   instance encoderDecoder, I/O queue input, I/O queue output, and error mode mode:
-   *   <ul>
-   *     <li>1) Assert: if encoderDecoder is an encoder instance, mode is not "replacement".</li>
-   *     <li>2) Assert: if encoderDecoder is a decoder instance, mode is not "html".</li>
-   *     <li>3) Assert: if encoderDecoder is an encoder instance, item is not a surrogate.</li>
-   *     <li>4) Let result be the result of running encoderDecoder’s handler on input and item.</li>
-   *     <li>5) If result is finished:
-   *       <ul>
-   *         <li>5.1) Push end-of-queue to output.</li>
-   *         <li>5.2) Return result.</li>
-   *       </ul>
-   *     </li>
-   *     <li>6) Otherwise, if result is one or more items:
-   *       <ul>
-   *         <li>6.1) Assert: if encoderDecoder is a decoder instance, result does not contain any surrogates.</li>
-   *         <li>6.2) Push result to output.</li>
-   *       </ul>
-   *     </li>
-   *     <li>7) Otherwise, if result is an error, switch on mode and run the associated steps:
-   *       <ul>
-   *         <li>"replacement": Push U+FFFD (�) to output.</li>
-   *         <li>"html": Push 0x26 (&), 0x23 (#), followed by the shortest sequence of 0x30 (0) to 0x39 (9), inclusive, representing result’s code point’s value in base ten, followed by 0x3B (;) to output.</li>
-   *         <li>"fatal": Return result.</li>
-   *       </ul>
-   *     </li>
-   *     <li>8) Return continue.</li>
-   *   </ul>
-   * </pre>
+   * doEncode is equivalent to processQueue/ProcessItem whose algorithm are described below.
+   * It does its job and call the resultHandler whenever
+   * <br/>
+   * </br/>ProcessQueue:
+   * To encode an I/O queue of scalar values ioQueue given an encoding encoding
+   * and an optional I/O queue of bytes output (default « »), run these steps:
+   * <ul>
+   *   <li>1) Let encoder be the result of getting an encoder from encoding.</li>
+   *   <li>2) Process a queue with encoder, ioQueue, output, and "html".</li>
+   *   <li>3) Return output.</li>
+   * </ul>
+   * <br/>
+   * </br/>ProcessItem:
+   * To process an item given an item item, encoding’s encoder or decoder
+   * instance encoderDecoder, I/O queue input, I/O queue output, and error mode mode:
+   * <ul>
+   *   <li>1) Assert: if encoderDecoder is an encoder instance, mode is not "replacement".</li>
+   *   <li>2) Assert: if encoderDecoder is a decoder instance, mode is not "html".</li>
+   *   <li>3) Assert: if encoderDecoder is an encoder instance, item is not a surrogate.</li>
+   *   <li>4) Let result be the result of running encoderDecoder’s handler on input and item.</li>
+   *   <li>5) If result is finished:
+   *     <ul>
+   *       <li>5.1) Push end-of-queue to output.</li>
+   *       <li>5.2) Return result.</li>
+   *     </ul>
+   *   </li>
+   *   <li>6) Otherwise, if result is one or more items:
+   *     <ul>
+   *       <li>6.1) Assert: if encoderDecoder is a decoder instance, result does not contain any surrogates.</li>
+   *       <li>6.2) Push result to output.</li>
+   *     </ul>
+   *   </li>
+   *   <li>7) Otherwise, if result is an error, switch on mode and run the associated steps:
+   *     <ul>
+   *       <li>"replacement": Push U+FFFD (�) to output.</li>
+   *       <li>"html": Push 0x26 (&), 0x23 (#), followed by the shortest sequence of 0x30 (0) to 0x39 (9), inclusive, representing result’s code point’s value in base ten, followed by 0x3B (;) to output.</li>
+   *       <li>"fatal": Return result.</li>
+   *     </ul>
+   *   </li>
+   *   <li>8) Return continue.</li>
+   * </ul>
    */
   static int doEncode(CharsetEncoder encoder, CharBuffer inputBuffer, ErrorMode errorMode,
       Consumer<ByteBuffer> resultHandler) {
@@ -201,21 +195,20 @@ public class InfraHelper {
   }
 
   /**
-   * <pre>
-   *   To encode or fail an I/O queue of scalar values ioQueue given an encoder
-   *   instance encoder and an I/O queue of bytes output, run these steps:</li>
-   *   <ul>
-   *     <li>1) Let potentialError be the result of processing a queue with encoder,
-   *     ioQueue, output, and "fatal".</li>
-   *     <li>2) Push end-of-queue to output.</li>
-   *     <li>3) If potentialError is an error, then return error’s code point’s value.</li>
-   *     <li>4) Return null.</li>
-   *   </ul>
-   * </pre>
+   * To encode or fail an I/O queue of scalar values ioQueue given an encoder
+   * instance encoder and an I/O queue of bytes output, run these steps:<br/>
+   * <ul>
+   *   <li>1) Let potentialError be the result of processing a queue with encoder,
+   *   ioQueue, output, and "fatal".</li>
+   *   <li>2) Push end-of-queue to output.</li>
+   *   <li>3) If potentialError is an error, then return error’s code point’s value.</li>
+   *   <li>4) Return null.</li>
+   * </ul>
    *
    * @param encoder the encoder to use
    * @param inputBuffer the input to encode
    * @param resultHandler the result handler
+   * @return the encoded value
    */
   public static int encodeOrFail(CharsetEncoder encoder, CharBuffer inputBuffer,
       Consumer<ByteBuffer> resultHandler) {
@@ -232,8 +225,8 @@ public class InfraHelper {
   /**
    * the isomorph value of a byte is a code point whose value is byte’s value.
    *
-   * @param aByte
-   * @return
+   * @param aByte the byte value
+   * @return the isomorph int value
    */
   public static int getIsomorphInt(byte aByte) {
     return Byte.toUnsignedInt(aByte);
@@ -243,8 +236,8 @@ public class InfraHelper {
    * To get an output encoding from an encoding encoding, run these steps: If encoding is
    * replacement, UTF-16BE, or UTF-16LE, return UTF-8. Return encoding.
    *
-   * @param encoding
-   * @return
+   * @param encoding the encoding to use
+   * @return the output encoding
    */
   public static Charset getOutputEncoding(Charset encoding) {
     if (encoding == StandardCharsets.UTF_16BE || encoding == StandardCharsets.UTF_16LE) {
@@ -335,7 +328,8 @@ public class InfraHelper {
   /**
    * A surrogate is a code point that is in the range U+D800 to U+DFFF, inclusive.
    *
-   * @return
+   * @param codePoint the codepoint to test
+   * @return true if the codepoint is a surrogate, false otherwise
    */
   public static boolean isSurrogate(int codePoint) {
     return codePoint >= 0xD800 && codePoint <= 0xDFFF;
@@ -345,6 +339,9 @@ public class InfraHelper {
    * To isomorphic decode a byte sequence input, return a string whose code point length is equal to
    * input’s length and whose code points have the same values as the values of input’s bytes, in
    * the same order.
+   *
+   * @param bytes the bytes to decode
+   * @return the decoded string
    */
   public static String isomorphicDecode(byte[] bytes) {
     int[] codepoints = new int[bytes.length];
@@ -355,31 +352,29 @@ public class InfraHelper {
   }
 
   /**
-   * <pre>
-   *   To strictly split a string input on a particular delimiter code point delimiter:
-   *   <ul>
-   *     <li>1) Let position be a position variable for input, initially
-   *     pointing at the start of input.</li>
-   *     <li>2) Let tokens be a list of strings, initially empty.</li>
-   *     <li>3) Let token be the result of collecting a sequence of code points
-   *     that are not equal to delimiter from input, given position.</li>
-   *     <li>4) Append token to tokens.</li>
-   *     <li>5) While position is not past the end of input:
-   *       <ul>
-   *         <li>5.1) Assert: the code point at position within input is delimiter.</li>
-   *         <li>5.2) Advance position by 1.</li>
-   *         <li>5.3) Let token be the result of collecting a sequence of code points
-   *         that are not equal to delimiter from input, given position.</li>
-   *         <li>5.4) Append token to tokens.</li>
-   *       </ul>
-   *       <li>6) Return tokens.</li>
-   *     </li>
-   *   </ul>
-   * </pre>
+   * To strictly split a string input on a particular delimiter code point delimiter:
+   * <ul>
+   *   <li>1) Let position be a position variable for input, initially
+   *   pointing at the start of input.</li>
+   *   <li>2) Let tokens be a list of strings, initially empty.</li>
+   *   <li>3) Let token be the result of collecting a sequence of code points
+   *   that are not equal to delimiter from input, given position.</li>
+   *   <li>4) Append token to tokens.</li>
+   *   <li>5) While position is not past the end of input:
+   *     <ul>
+   *       <li>5.1) Assert: the code point at position within input is delimiter.</li>
+   *       <li>5.2) Advance position by 1.</li>
+   *       <li>5.3) Let token be the result of collecting a sequence of code points
+   *       that are not equal to delimiter from input, given position.</li>
+   *       <li>5.4) Append token to tokens.</li>
+   *     </ul>
+   *   </li>
+   *   <li>6) Return tokens.</li>
+   * </ul>
    *
-   * @param value
-   * @param delimiter
-   * @return
+   * @param value the value to split
+   * @param delimiter the delimiter to split-on
+   * @return the result
    */
   public static List<String> strictSplit(String value, char delimiter) {
     // 1
@@ -409,8 +404,8 @@ public class InfraHelper {
    * convert the specified byte value (unsigned) to its hexadecimal representation as two ASCII
    * upper hex digit (0 to 9, A to F)
    *
-   * @param value
-   * @return
+   * @param value the byte value to convert
+   * @return the hexadecimal value as an array of chars
    */
   static char[] toHexChars(byte value) {
     byte unsignedValue = (byte) (value & 0xF);

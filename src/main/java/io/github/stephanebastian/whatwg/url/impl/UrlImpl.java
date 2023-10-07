@@ -84,13 +84,11 @@ public class UrlImpl implements Url {
   }
 
   /**
-   * <pre>
-   *   The hash getter steps are:
-   *   <ul>
-   *     <li>1) If this’s URL’s fragment is either null or the empty string, then return the empty string.</li>
-   *     <li>2) Return U+0023 (#), followed by this’s URL’s fragment.</li>
-   *   </ul>
-   * </pre>
+   * The hash getter steps are:
+   * <ul>
+   *   <li>1) If this’s URL’s fragment is either null or the empty string, then return the empty string.</li>
+   *   <li>2) Return U+0023 (#), followed by this’s URL’s fragment.</li>
+   * </ul>
    */
   @Override
   public String hash() {
@@ -103,21 +101,19 @@ public class UrlImpl implements Url {
   }
 
   /**
-   * <pre>
-   *   The hash setter steps are:
-   *   <ul>
-   *     <li>1) If the given value is the empty string:
-   *       <ul>
-   *         <li>1.1) Set this’s URL’s fragment to null.</li>
-   *         <li>1.2) Potentially strip trailing spaces from an opaque path with this.</li>
-   *         <li>1.3) Return.</li>
-   *       </ul>
-   *     </li>
-   *     <li>2) Let input be the given value with a single leading U+0023 (#) removed, if any.</li>
-   *     <li>3) Set this’s URL’s fragment to the empty string.</li>
-   *     <li>4) Basic URL parse input with this’s URL as url and fragment state as state override.</li>
-   *   </ul>
-   * </pre>
+   * The hash setter steps are:
+   * <ul>
+   *   <li>1) If the given value is the empty string:
+   *     <ul>
+   *       <li>1.1) Set this’s URL’s fragment to null.</li>
+   *       <li>1.2) Potentially strip trailing spaces from an opaque path with this.</li>
+   *       <li>1.3) Return.</li>
+   *     </ul>
+   *   </li>
+   *   <li>2) Let input be the given value with a single leading U+0023 (#) removed, if any.</li>
+   *   <li>3) Set this’s URL’s fragment to the empty string.</li>
+   *   <li>4) Basic URL parse input with this’s URL as url and fragment state as state override.</li>
+   * </ul>
    */
   @Override
   public Url hash(String value) {
@@ -146,15 +142,13 @@ public class UrlImpl implements Url {
   }
 
   /**
-   * <pre>
-   *   The host getter steps are:
-   *   <ul>
-   *     <li>Let url be this’s URL.</li>
-   *     <li>If url’s host is null, then return the empty string.</li>
-   *     <li>If url’s port is null, return url’s host, serialized.</li>
-   *     <li>Return url’s host, serialized, followed by U+003A (:) and url’s port, serialized.erialized.</li>
-   *   </ul>
-   * </pre>
+   * The host getter steps are:
+   * <ul>
+   *   <li>Let url be this’s URL.</li>
+   *   <li>If url’s host is null, then return the empty string.</li>
+   *   <li>If url’s port is null, return url’s host, serialized.</li>
+   *   <li>Return url’s host, serialized, followed by U+003A (:) and url’s port, serialized.erialized.</li>
+   * </ul>
    */
   @Override
   public String host() {
@@ -174,13 +168,11 @@ public class UrlImpl implements Url {
   }
 
   /**
-   * <pre>
-   *   The host setter steps are:
-   *   <ul>
-   *     <li>If this’s URL has an opaque path, then return.</li>
-   *     <li>Basic URL parse the given value with this’s URL as url and host state as state override.</li>
-   *   </ul>
-   * </pre>
+   * The host setter steps are:
+   * <ul>
+   *   <li>If this’s URL has an opaque path, then return.</li>
+   *   <li>Basic URL parse the given value with this’s URL as url and host state as state override.</li>
+   * </ul>
    */
   @Override
   public Url host(String value) {
@@ -196,13 +188,11 @@ public class UrlImpl implements Url {
   }
 
   /**
-   * <pre>
-   *   The hostname getter steps are:
-   *   <ul>
-   *     <li>If this’s URL’s host is null, then return the empty string.</li>
-   *     <li>Return this’s URL’s host, serialized.</li>
-   *   </ul>
-   * </pre>
+   * The hostname getter steps are:
+   * <ul>
+   *   <li>If this’s URL’s host is null, then return the empty string.</li>
+   *   <li>Return this’s URL’s host, serialized.</li>
+   * </ul>
    */
   @Override
   public String hostname() {
@@ -215,13 +205,11 @@ public class UrlImpl implements Url {
   }
 
   /**
-   * <pre>
-   *   The hostname setter steps are:
-   *   <ul>
-   *     <li>If this’s URL has an opaque path, then return.</li>
-   *     <li>Basic URL parse the given value with this’s URL as url and hostname state as state override.</li>
-   *   </ul>
-   * </pre>
+   * The hostname setter steps are:
+   * <ul>
+   *   <li>If this’s URL has an opaque path, then return.</li>
+   *   <li>Basic URL parse the given value with this’s URL as url and hostname state as state override.</li>
+   * </ul>
    */
   @Override
   public Url hostname(String value) {
@@ -248,16 +236,15 @@ public class UrlImpl implements Url {
   }
 
   /**
-   * <pre>
    * The href setter steps are:
    * <ul>
-   * <li>Let parsedURL be the result of running the basic URL parser on the given value.</li>
-   * <li>If parsedURL is failure, then throw a TypeError.</li>
-   * <li>Set this’s URL to parsedURL.</li>
-   * <li>Empty this’s query object’s list.</li>
-   * <li>Let query be this’s URL’s query.</li>
-   * <li>If query is non-null, then set this’s query object’s list to the result of parsing
-   * query.</li>
+   *   <li>Let parsedURL be the result of running the basic URL parser on the given value.</li>
+   *   <li>If parsedURL is failure, then throw a TypeError.</li>
+   *   <li>Set this’s URL to parsedURL.</li>
+   *   <li>Empty this’s query object’s list.</li>
+   *   <li>Let query be this’s URL’s query.</li>
+   *   <li>If query is non-null, then set this’s query object’s list to the result of parsing
+   *   query.</li>
    * </ul>
    *
    * @param value the href to set
@@ -338,14 +325,12 @@ public class UrlImpl implements Url {
   }
 
   /**
-   * <pre>
-   *   The pathname setter steps are:
-   *   <ul>
-   *     <li>If this’s URL has an opaque path, then return.</li>
-   *     <li>Empty this’s URL’s path.</li>
-   *     <li>Basic URL parse the given value with this’s URL as url and path start state as state override.</li>
-   *   </ul>
-   * </pre>
+   * The pathname setter steps are:
+   * <ul>
+   *   <li>If this’s URL has an opaque path, then return.</li>
+   *   <li>Empty this’s URL’s path.</li>
+   *   <li>Basic URL parse the given value with this’s URL as url and path start state as state override.</li>
+   * </ul>
    */
   @Override
   public Url pathname(String value) {
@@ -365,13 +350,11 @@ public class UrlImpl implements Url {
   }
 
   /**
-   * <pre>
-   *   The port getter steps are:
-   *   <ul>
-   *     <li>1) If this’s URL’s port is null, then return the empty string.</li>
-   *     <li>2) Return this’s URL’s port, serialized.</li>
-   *   </ul>
-   * </pre>
+   * The port getter steps are:
+   * <ul>
+   *   <li>1) If this’s URL’s port is null, then return the empty string.</li>
+   *   <li>2) Return this’s URL’s port, serialized.</li>
+   * </ul>
    */
   @Override
   public String port() {
@@ -382,14 +365,12 @@ public class UrlImpl implements Url {
   }
 
   /**
-   * <pre>
-   *   The port setter steps are:
-   *   <ul>
-   *     <li>1) If this’s URL cannot have a username/password/port, then return.</li>
-   *     <li>2) If the given value is the empty string, then set this’s URL’s port to null.</li>
-   *     <li>3) Otherwise, basic URL parse the given value with this’s URL as url and port state as state override.</li>
-   *   </ul>
-   * </pre>
+   * The port setter steps are:
+   * <ul>
+   *   <li>1) If this’s URL cannot have a username/password/port, then return.</li>
+   *   <li>2) If the given value is the empty string, then set this’s URL’s port to null.</li>
+   *   <li>3) Otherwise, basic URL parse the given value with this’s URL as url and port state as state override.</li>
+   * </ul>
    */
   @Override
   public Url port(String value) {
@@ -413,15 +394,13 @@ public class UrlImpl implements Url {
   }
 
   /**
-   * <pre>
-   *   To potentially strip trailing spaces from an opaque path given a URL object url:
-   *   <ul>
-   *     <li>1) If url’s URL does not have an opaque path, then return.</li>
-   *     <li>2) If url’s URL’s fragment is non-null, then return.</li>
-   *     <li>3) If url’s URL’s query is non-null, then return.</li>
-   *     <li>4) Remove all trailing U+0020 SPACE code points from url’s URL’s path.</li>
-   *   </ul>
-   * </pre>
+   * To potentially strip trailing spaces from an opaque path given a URL object url:
+   * <ul>
+   *   <li>1) If url’s URL does not have an opaque path, then return.</li>
+   *   <li>2) If url’s URL’s fragment is non-null, then return.</li>
+   *   <li>3) If url’s URL’s query is non-null, then return.</li>
+   *   <li>4) Remove all trailing U+0020 SPACE code points from url’s URL’s path.</li>
+   * </ul>
    */
   private void potentiallySkipTrailingSpaceFromAnOpaquePath() {
     // 1
@@ -476,13 +455,11 @@ public class UrlImpl implements Url {
   }
 
   /**
-   * <pre>
-   *   The search getter steps are:
-   *   <ul>
-   *     <li>If this’s URL’s query is either null or the empty string, then return the empty string.</li>
-   *     <li>Return U+003F (?), followed by this’s URL’s query.</li>
-   *   </ul>
-   * </pre>
+   * The search getter steps are:
+   * <ul>
+   *   <li>If this’s URL’s query is either null or the empty string, then return the empty string.</li>
+   *   <li>Return U+003F (?), followed by this’s URL’s query.</li>
+   * </ul>
    */
   @Override
   public String search() {
@@ -495,28 +472,26 @@ public class UrlImpl implements Url {
   }
 
   /**
-   * <pre>
-   *   The search setter steps are:
-   *   <ul>
-   *     <li>1) Let url be this’s URL.</li>
-   *     <li>2) If the given value is the empty string:
-   *       <ul>
-   *         <li>2.1) Set url’s query to null.</li>
-   *         <li>2.2) Empty this’s query object’s list.</li>
-   *         <li>2.3) Potentially strip trailing spaces from an opaque path with this.</li>
-   *         <li>2.4) Return.</li>
-   *       </ul>
-   *     </li>
-   *     <li>3) Let input be the given value with a single leading U+003F (?) removed, if any.</li>
-   *     <li>4) Set url’s query to the empty string.</li>
-   *     <li>5) Basic URL parse input with url as url and query state as state override.</li>
-   *     <li>6) Set this’s query object’s list to the result of parsing input.</li>
-   *   </ul>
-   *   <br/>
-   *   <br/>The search setter has the potential to remove trailing U+0020 SPACE code points
-   *   from this’s URL’s path. It does this so that running the URL parser on the output
-   *   of running the URL serializer on this’s URL does not yield a URL that is not equal.
-   * </pre>
+   * The search setter steps are:
+   * <ul>
+   *   <li>1) Let url be this’s URL.</li>
+   *   <li>2) If the given value is the empty string:
+   *     <ul>
+   *       <li>2.1) Set url’s query to null.</li>
+   *       <li>2.2) Empty this’s query object’s list.</li>
+   *       <li>2.3) Potentially strip trailing spaces from an opaque path with this.</li>
+   *       <li>2.4) Return.</li>
+   *     </ul>
+   *   </li>
+   *   <li>3) Let input be the given value with a single leading U+003F (?) removed, if any.</li>
+   *   <li>4) Set url’s query to the empty string.</li>
+   *   <li>5) Basic URL parse input with url as url and query state as state override.</li>
+   *   <li>6) Set this’s query object’s list to the result of parsing input.</li>
+   * </ul>
+   * <br/>
+   * <br/>The search setter has the potential to remove trailing U+0020 SPACE code points
+   * from this’s URL’s path. It does this so that running the URL parser on the output
+   * of running the URL serializer on this’s URL does not yield a URL that is not equal.
    */
   @Override
   public Url search(String value) {
@@ -593,13 +568,11 @@ public class UrlImpl implements Url {
   }
 
   /**
-   * <pre>
-   *   The username setter steps are:
-   *   <ul>
-   *     <li>1) If this’s URL cannot have a username/password/port, then return.</li>
-   *     <li>2) Set the username given this’s URL and the given value.
-   *   </ul>
-   * </pre>
+   * The username setter steps are:
+   * <ul>
+   *   <li>1) If this’s URL cannot have a username/password/port, then return.</li>
+   *   <li>2) Set the username given this’s URL and the given value.
+   * </ul>
    */
   @Override
   public Url username(String value) {
@@ -792,19 +765,17 @@ public class UrlImpl implements Url {
     }
 
     /**
-     * <pre>
-     *   To update a URLSearchParams object query:
-     *   <ul>
-     *     <li>1) If query’s URL object is null, then return.</li>
-     *     <li>2) Let serializedQuery be the serialization of query’s list.</li>
-     *     <li>3) If serializedQuery is the empty string, then set serializedQuery to null.</li>
-     *     <li>4) Set query’s URL object’s URL’s query to serializedQuery.</li>
-     *     <li>5) If serializedQuery is null, then potentially strip trailing spaces
-     *     from an opaque path with query’s URL object.</li>
-     *     <li></li>
-     *     <li></li>
-     *   </ul>
-     * </pre>
+     * To update a URLSearchParams object query:
+     * <ul>
+     *   <li>1) If query’s URL object is null, then return.</li>
+     *   <li>2) Let serializedQuery be the serialization of query’s list.</li>
+     *   <li>3) If serializedQuery is the empty string, then set serializedQuery to null.</li>
+     *   <li>4) Set query’s URL object’s URL’s query to serializedQuery.</li>
+     *   <li>5) If serializedQuery is null, then potentially strip trailing spaces
+     *   from an opaque path with query’s URL object.</li>
+     *   <li></li>
+     *   <li></li>
+     * </ul>
      */
     void updateSteps() {
       // 1 is not appropriate since we always have a URL object
