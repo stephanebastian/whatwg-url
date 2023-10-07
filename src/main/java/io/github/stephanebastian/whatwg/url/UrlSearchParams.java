@@ -5,7 +5,7 @@ import java.util.function.BiConsumer;
 
 /**
  * This interface represents <a href="https://url.spec.whatwg.org/#interface-urlsearchparams">the
- * URLSearchParams interface defined by the WhatWg specification</a>. </br>
+ * URLSearchParams interface defined by the WhatWg specification</a>. <br>
  *
  * Although the spec support a public constructor, the current implementation does not provide one.
  * The main reason is that it doesn't seem relevant or appropriate for the java implementation. This

@@ -289,13 +289,11 @@ public class UrlImpl implements Url {
   }
 
   /**
-   * <pre>
-   *   The password setter steps are:
-   *   <ul>
-   *     <li>If this’s URL cannot have a username/password/port, then return.</li>
-   *     <li>Set the password given this’s URL and the given value.</li>
-   *   </ul>
-   * </pre>
+   * The password setter steps are:
+   * <ul>
+   *   <li>If this’s URL cannot have a username/password/port, then return.</li>
+   *   <li>Set the password given this’s URL and the given value.</li>
+   * </ul>
    */
   @Override
   public Url password(String value) {
@@ -488,8 +486,8 @@ public class UrlImpl implements Url {
    *   <li>5) Basic URL parse input with url as url and query state as state override.</li>
    *   <li>6) Set this’s query object’s list to the result of parsing input.</li>
    * </ul>
-   * <br/>
-   * <br/>The search setter has the potential to remove trailing U+0020 SPACE code points
+   * <br>
+   * <br>The search setter has the potential to remove trailing U+0020 SPACE code points
    * from this’s URL’s path. It does this so that running the URL parser on the output
    * of running the URL serializer on this’s URL does not yield a URL that is not equal.
    */

@@ -98,7 +98,7 @@ public class InfraHelper {
   /**
    * doEncode is equivalent to processQueue/ProcessItem whose algorithm are described below.
    * It does its job and call the resultHandler whenever
-   * <br/>
+   * <br>
    * </br/>ProcessQueue:
    * To encode an I/O queue of scalar values ioQueue given an encoding encoding
    * and an optional I/O queue of bytes output (default « »), run these steps:
@@ -107,7 +107,7 @@ public class InfraHelper {
    *   <li>2) Process a queue with encoder, ioQueue, output, and "html".</li>
    *   <li>3) Return output.</li>
    * </ul>
-   * <br/>
+   * <br>
    * </br/>ProcessItem:
    * To process an item given an item item, encoding’s encoder or decoder
    * instance encoderDecoder, I/O queue input, I/O queue output, and error mode mode:
@@ -196,7 +196,7 @@ public class InfraHelper {
 
   /**
    * To encode or fail an I/O queue of scalar values ioQueue given an encoder
-   * instance encoder and an I/O queue of bytes output, run these steps:<br/>
+   * instance encoder and an I/O queue of bytes output, run these steps:<br>
    * <ul>
    *   <li>1) Let potentialError be the result of processing a queue with encoder,
    *   ioQueue, output, and "fatal".</li>
@@ -414,11 +414,11 @@ public class InfraHelper {
   }
 
   /**
-   * A scalar value string is a string whose code points are all scalar values. <br/>
-   * <br/>
-   * A scalar value string is useful for any kind of I/O or other kind <br/>
-   * of operation where UTF-8 encode comes into play. <br/>
-   * <br/>
+   * A scalar value string is a string whose code points are all scalar values. <br>
+   * <br>
+   * A scalar value string is useful for any kind of I/O or other kind <br>
+   * of operation where UTF-8 encode comes into play. <br>
+   * <br>
    * To convert a string into a scalar value string, replace any surrogates with U+FFFD (�).
    *
    * @param codepoints the codepoints array whose surrogates need to be replaced

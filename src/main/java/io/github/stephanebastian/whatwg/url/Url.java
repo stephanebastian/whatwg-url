@@ -7,8 +7,8 @@ import java.util.function.Consumer;
 /**
  * This is the main interface of the project. It closely follows
  * <a href="https://url.spec.whatwg.org/#url-class">the URL interface defined by the WhatWg
- * specification</a>.<br/>
- * <br/>
+ * specification</a>.<br>
+ * <br>
  * To get an instance of a URL you can:
  * <ul>
  *   <li>Create a blank new url by calling UrlBuilder.create()</li>
@@ -54,8 +54,8 @@ public interface Url {
   }
 
   /**
-   * Create a new Url from the specified input, base url and error handler. <br/>
-   * Note that this method is not defined by the spec but provide an easy way <br/>
+   * Create a new Url from the specified input, base url and error handler. <br>
+   * Note that this method is not defined by the spec but provide an easy way <br>
    * of reporting potential errors
    *
    * @param input the input to parse and create an Url from

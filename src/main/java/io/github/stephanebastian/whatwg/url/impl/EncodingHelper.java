@@ -15,14 +15,12 @@ public class EncodingHelper {
   }
 
   /**
-   * <pre>
-   *   To UTF-8 decode without BOM an I/O queue of bytes ioQueue given an optional
-   *   I/O queue of scalar values output (default « »), run these steps:
-   *   <ul>
-   *     <li>1) Process a queue with an instance of UTF-8’s decoder, ioQueue, output, and "replacement".</li>
-   *     <li>2) Return output.</li>
-   *   </ul>
-   * </pre>
+   * To UTF-8 decode without BOM an I/O queue of bytes ioQueue given an optional
+   * I/O queue of scalar values output (default « »), run these steps:
+   * <ul>
+   *   <li>1) Process a queue with an instance of UTF-8’s decoder, ioQueue, output, and "replacement".</li>
+   *   <li>2) Return output.</li>
+   * </ul>
    *
    * @param input the input to decode
    * @return the decoded input as a string

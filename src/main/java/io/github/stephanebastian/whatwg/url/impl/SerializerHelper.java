@@ -51,7 +51,7 @@ public class SerializerHelper {
    *   <li>3) If url’s host is null, url does not have an opaque path, url’s path’s size is greater
    *   than 1, and url’s path[0] is the empty string, then append U+002F (/) followed by U+002E (.) to
    *   output.
-   *   <br/>This prevents web+demo:/.//not-a-host/ or web+demo:/path/..//not-a-host/, when parsed and then
+   *   <br>This prevents web+demo:/.//not-a-host/ or web+demo:/path/..//not-a-host/, when parsed and then
    *   serialized, from ending up as web+demo://not-a-host/ (they end up as
    *   web+demo:/.//not-a-host/).</li>
    *   <li>4) Append the result of URL path serializing url to output.</li>
@@ -271,7 +271,7 @@ public class SerializerHelper {
    *         <li>If pathURL’s scheme is "http", "https", or "file", then return
    *         pathURL’s origin.</li>
    *         <li>Return a new opaque origin.
-   *         <br/>The origin of blob:https://whatwg.org/d0360e2f-caee-469f-9a2f-87d5b0456f6f
+   *         <br>The origin of blob:https://whatwg.org/d0360e2f-caee-469f-9a2f-87d5b0456f6f
    *         is the tuple origin ("https", "whatwg.org", null, null).
    *         </li>
    *       </ul>
@@ -290,7 +290,7 @@ public class SerializerHelper {
    *    <li>Otherwise:
    *      <ul>
    *        <li>Return a new opaque origin.
-   *        <br/>This does indeed mean that these URLs cannot be same origin
+   *        <br>This does indeed mean that these URLs cannot be same origin
    *        with themselves.</li></li>
    *      </ul>
    *   </ul>*

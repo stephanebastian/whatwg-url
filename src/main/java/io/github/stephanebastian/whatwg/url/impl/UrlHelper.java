@@ -54,8 +54,8 @@ class UrlHelper {
    *     CheckJoiners set to true,
    *     Transitional_Processing set to false,
    *     and VerifyDnsLength set to beStrict. [UTS46]</li>
-   *     <br/>
-   *     <br/>If beStrict is false, domain is an ASCII string, and strictly splitting
+   *     <br>
+   *     <br>If beStrict is false, domain is an ASCII string, and strictly splitting
    *     domain on U+002E (.) does not produce any item that starts with an ASCII
    *     case-insensitive match for "xn--", this step is equivalent to ASCII lowercasing domain.</li>
    *     <li>2) If result is a failure value, domain-to-ASCII validation error, return failure.</li>
@@ -316,7 +316,7 @@ class UrlHelper {
 
   /**
    * <pre>
-   * To percent-decode a byte sequence input, run these steps: <br/>
+   * To percent-decode a byte sequence input, run these steps: <br>
    * Using anything but UTF-8 decode without BOM when input contains bytes that are not ASCII bytes
    * might be insecure and is not recommended.
    * <ul>
@@ -423,7 +423,7 @@ class UrlHelper {
    *     <li>2) Let inputQueue be input converted to an I/O queue.</li>
    *     <li>3) Let output be the empty string.</li>
    *     <li>4) Let potentialError be 0.
-   *     <br/>This needs to be a non-null value to initiate the subsequent while loop.
+   *     <br>This needs to be a non-null value to initiate the subsequent while loop.
    *     </li>
    *     <li>5) While potentialError is non-null:
    *       <ul>
@@ -439,8 +439,8 @@ class UrlHelper {
    *           </ul>
    *         </li>
    *         <li>5.4) If potentialError is non-null, then append "%26%23", followed by the shortest sequence of ASCII digits representing potentialError in base ten, followed by "%3B", to output.
-   *           <br/>
-   *           <br/>This can happen when encoding is not UTF-8.
+   *           <br>
+   *           <br>This can happen when encoding is not UTF-8.
    *         </li>
    *       </ul>
    *     </li>

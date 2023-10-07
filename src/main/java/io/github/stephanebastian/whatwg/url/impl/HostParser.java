@@ -10,7 +10,7 @@ public class HostParser {
   /**
    * <pre>
    * The ends in a number checker takes an ASCII string input and then runs
-   * <br/>these steps. They return a boolean.
+   * <br>these steps. They return a boolean.
    * <ul>
    *   <li>1) Let parts be the result of strictly splitting input on U+002E (.).</li>
    *   <li>2) If the last item in parts is the empty string, then:
@@ -21,10 +21,10 @@ public class HostParser {
    *   </li>
    *   <li>3) Let last be the last item in parts.</li>
    *   <li>4) If last is non-empty and contains only ASCII digits, then return true.
-   *   <br/>The erroneous input "09" will be caught by the IPv4 parser at a later stage.</li>
+   *   <br>The erroneous input "09" will be caught by the IPv4 parser at a later stage.</li>
    *   <li>5) If parsing last as an IPv4 number does not return failure, then return true.
-   *   <br/>This is equivalent to checking that last is "0X" or "0x",
-   *   <br/>followed by zero or more ASCII hex digits.</li>
+   *   <br>This is equivalent to checking that last is "0X" or "0x",
+   *   <br>followed by zero or more ASCII hex digits.</li>
    *   <li>Return false.</li>
    * </ul>
    * </pre>
@@ -90,7 +90,7 @@ public class HostParser {
    *     <li>2) If isNotSpecial is true, then return the result of opaque-host parsing input.</li>
    *     <li>3) Assert: input is not the empty string.</li>
    *     <li>4) Let domain be the result of running UTF-8 decode without BOM on the percent-decoding of input.
-   *     <br/>Note: Alternatively UTF-8 decode without BOM or fail can be used, coupled with an early return for failure, as domain to ASCII fails on U+FFFD (�).
+   *     <br>Note: Alternatively UTF-8 decode without BOM or fail can be used, coupled with an early return for failure, as domain to ASCII fails on U+FFFD (�).
    *     </li>
    *     <li>5) Let asciiDomain be the result of running domain to ASCII with domain and false.</li>
    *     <li>6) If asciiDomain is failure, then return failure.</li>
@@ -140,9 +140,9 @@ public class HostParser {
   /**
    * <pre>
    * The IPv4 parser takes an ASCII string input and then runs these steps.
-   * <br/>They return failure or an IPv4 address.
-   * <br/>The IPv4 parser is not to be invoked directly.
-   * <br/>Instead check that the return value of the host parser is an IPv4 address.
+   * <br>They return failure or an IPv4 address.
+   * <br>The IPv4 parser is not to be invoked directly.
+   * <br>Instead check that the return value of the host parser is an IPv4 address.
    * <ul>
    *   <li>1) Let parts be the result of strictly splitting input on U+002E (.).</li>
    *   <li>2) If the last item in parts is the empty string, then:
@@ -251,13 +251,13 @@ public class HostParser {
   /**
    * <pre>
    * The IPv4 number parser takes an ASCII string input and then runs these steps.
-   * <br/>They return failure or a tuple of a number and a boolean.
+   * <br>They return failure or a tuple of a number and a boolean.
    * <ul>
    *   <li>1) If input is the empty string, then return failure.</li>
    *   <li>2) Let validationError be false.</li>
    *   <li>3) Let R be 10.</li>
    *   <li>4) If input contains at least two code points and the first two code points
-   *   <br/>are either "0X" or "0x", then:
+   *   <br>are either "0X" or "0x", then:
    *     <ul>
    *        <li>4.1) Set validationError to true.</li>
    *        <li>4.2) Remove the first two code points from input.</li>
@@ -265,7 +265,7 @@ public class HostParser {
    *     </ul>
    *   </li>
    *   <li>5) Otherwise, if input contains at least two code points
-   *   <br/>and the first code point is U+0030 (0), then:
+   *   <br>and the first code point is U+0030 (0), then:
    *     <ul>
    *       <li>5.1) Set validationError to true.</li>
    *       <li>5.2) Remove the first code point from input.</li>
@@ -275,7 +275,7 @@ public class HostParser {
    *   <li>6) If input is the empty string, then return (0, true).</li>
    *   <li>7) If input contains a code point that is not a radix-R digit, then return failure.</li>
    *   <li>8) Let output be the mathematical integer value that is represented
-   *   <br/>by input in radix-R notation, using ASCII hex digits for digits with values 0 through 15.</li>
+   *   <br>by input in radix-R notation, using ASCII hex digits for digits with values 0 through 15.</li>
    *   <li>9) Return (output, validationError).</li>
    * </ul>
    * </pre>
@@ -335,9 +335,9 @@ public class HostParser {
   /**
    * <pre>
    * The IPv6 parser takes a scalar value string input and then runs these steps.
-   * <br/>They return failure or an IPv6 address.
-   * <br/>The IPv6 parser could in theory be invoked directly, but please discuss
-   * <br/>actually doing that with the editors of this document first.
+   * <br>They return failure or an IPv6 address.
+   * <br>The IPv6 parser could in theory be invoked directly, but please discuss
+   * <br>actually doing that with the editors of this document first.
    * <ul>
    *   <li>1) Let address be a new IPv6 address whose IPv6 pieces are all 0.</li>
    *   <li>2) Let pieceIndex be 0.</li>
@@ -391,10 +391,10 @@ public class HostParser {
    *                 <ul>
    *                   <li>6.5.5.4.1) Let number be c interpreted as decimal number.</li>
    *                   <li>6.5.5.4.2) If ipv4Piece is null, then set ipv4Piece to number.
-   *                   <br/>Otherwise, if ipv4Piece is 0, IPv4-in-IPv6-invalid-code-point validation error,
-   *                   <br/>return failure.
-   *                   <br/>
-   *                   <br/>Otherwise, set ipv4Piece to ipv4Piece × 10 + number.
+   *                   <br>Otherwise, if ipv4Piece is 0, IPv4-in-IPv6-invalid-code-point validation error,
+   *                   <br>return failure.
+   *                   <br>
+   *                   <br>Otherwise, set ipv4Piece to ipv4Piece × 10 + number.
    *                   </li>
    *                   <li>6.5.5.4.3) If ipv4Piece is greater than 255, IPv4-in-IPv6-out-of-range-part validation error,
    *                   return failure.</li>
@@ -601,7 +601,7 @@ public class HostParser {
   /**
    * <pre>
    * The opaque-host parser takes a scalar value string input, and then runs these steps.
-   * <br/>They return failure or an opaque host.
+   * <br>They return failure or an opaque host.
    * <ul>
    *   <li>1) If input contains a forbidden host code point, host-invalid-code-point
    *   validation error, return failure.</li>

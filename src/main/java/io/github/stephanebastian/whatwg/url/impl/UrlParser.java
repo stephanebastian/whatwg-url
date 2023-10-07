@@ -59,9 +59,9 @@ class UrlParser {
    *     </ul>
    *  </li>
    *  <li>2) Otherwise, if one of the following is true:
-   *    <br/>c is the EOF code point, U+002F (/), U+003F (?), or U+0023 (#)
-   *    <br/>url is special and c is U+005C (\)
-   *    <br/>then:
+   *    <br>c is the EOF code point, U+002F (/), U+003F (?), or U+0023 (#)
+   *    <br>url is special and c is U+005C (\)
+   *    <br>then:
    *    <ul>
    *      <li>2.1) If atSignSeen is true and buffer is the empty string,
    *      invalid-credentials validation error, return failure.</li>
@@ -132,11 +132,11 @@ class UrlParser {
    *   or base URL base (default null), an optional encoding encoding (default UTF-8),
    *   an optional URL url, and an optional state override state override,
    *   and then runs these steps:
-   *   <br/>
-   *   <br/>The encoding argument is a legacy concept only relevant for HTML.
+   *   <br>
+   *   <br>The encoding argument is a legacy concept only relevant for HTML.
    *   The url and state override arguments are only for use by various APIs.
-   *   <br/>
-   *   <br/>When the url and state override arguments are not passed, the basic URL parser
+   *   <br>
+   *   <br>When the url and state override arguments are not passed, the basic URL parser
    *   returns either a new URL or failure. If they are passed, the algorithm modifies
    *   the passed url and can terminate without returning anything.
    *   <ul>
@@ -252,8 +252,8 @@ class UrlParser {
    *     <ul>
    *       <li>1.1) If state override is not given and buffer is a Windows drive letter,
    *       file-invalid-Windows-drive-letter-host validation error, set state to path state.
-   *       <br/>
-   *       <br/>This is a (platform-independent) Windows drive letter quirk.
+   *       <br>
+   *       <br>This is a (platform-independent) Windows drive letter quirk.
    *       buffer is not reset here and instead used in the path state.</li>
    *       <li>1.2) Otherwise, if buffer is the empty string, then:
    *         <ul>
@@ -344,7 +344,7 @@ class UrlParser {
    *           does not start with a Windows drive letter and base’s path[0]
    *           is a normalized Windows drive letter, then append base’s path[0] to url’s path.</li>
    *
-   *           <br/>This is a (platform-independent) Windows drive letter quirk.
+   *           <br>This is a (platform-independent) Windows drive letter quirk.
    *         </ul>
    *       </li>
    *       <li>2.2) Set state to path state, and decrease pointer by 1.</li>
@@ -410,7 +410,7 @@ class UrlParser {
    *             <ul>
    *               <li>4.4.3.1) File-invalid-Windows-drive-letter validation error.</li>
    *               <li>4.4.3.2) Set url’s path to « ».
-   *               <br/>This is a (platform-independent) Windows drive letter quirk.
+   *               <br>This is a (platform-independent) Windows drive letter quirk.
    *               </li>
    *             </ul>
    *           </li>
@@ -538,7 +538,7 @@ class UrlParser {
    *          <li>url is special and c is U+005C (\)</li>
    *          <li></li>
    *        </ul>
-   *        <br/>then decrease pointer by 1, and then:
+   *        <br>then decrease pointer by 1, and then:
    *        <ul>
    *          <li>3.1) If url is special and buffer is the empty string, host-missing validation error, return failure.</li>
    *          <li>3.2) Otherwise, if state override is given, buffer is the empty string, and either url includes credentials or url’s port is non-null, return.</li>
@@ -823,12 +823,12 @@ class UrlParser {
    * <pre>
    * <ul>
    *   <li>1) If one of the following is true:
-   *     <br/>c is the EOF code point or U+002F (/)
-   *     <br/>
-   *     <br/>url is special and c is U+005C (\)
-   *     <br/>
-   *     <br/>state override is not given and c is U+003F (?) or U+0023 (#)
-   *     <br/>then:
+   *     <br>c is the EOF code point or U+002F (/)
+   *     <br>
+   *     <br>url is special and c is U+005C (\)
+   *     <br>
+   *     <br>state override is not given and c is U+003F (?) or U+0023 (#)
+   *     <br>then:
    *     <ul>
    *       <li>1.1) If url is special and c is U+005C (\), invalid-reverse-solidus validation error.</li>
    *       <li>1.2) If buffer is a double-dot URL path segment, then:
@@ -836,8 +836,8 @@ class UrlParser {
    *           <li>1.2.1) Shorten url’s path.</li>
    *           <li>1.2.2) If neither c is U+002F (/), nor url is special
    *           and c is U+005C (\), append the empty string to url’s path.
-   *           <br/>
-   *           <br/>This means that for input /usr/.. the result is / and not a lack of a path.
+   *           <br>
+   *           <br>This means that for input /usr/.. the result is / and not a lack of a path.
    *           </li>
    *         </ul>
    *       </li>
@@ -849,8 +849,8 @@ class UrlParser {
    *           <li>1.4.1) If url’s scheme is "file", url’s path is empty,
    *           and buffer is a Windows drive letter, then replace the second
    *           code point in buffer with U+003A (:).
-   *           <br/>
-   *           <br/>This is a (platform-independent) Windows drive letter quirk.
+   *           <br>
+   *           <br>This is a (platform-independent) Windows drive letter quirk.
    *           </li>
    *           <li>Append buffer to url’s path.</li>
    *         </ul>
@@ -950,10 +950,10 @@ class UrlParser {
    *   <ul>
    *     <li>1) If c is an ASCII digit, append c to buffer.</li>
    *     <li>2) Otherwise, if one of the following is true:
-   *       <br/>c is the EOF code point, U+002F (/), U+003F (?), or U+0023 (#)
-   *       <br/>url is special and c is U+005C (\)
-   *       <br/>state override is given
-   *       <br/>then:
+   *       <br>c is the EOF code point, U+002F (/), U+003F (?), or U+0023 (#)
+   *       <br>url is special and c is U+005C (\)
+   *       <br>state override is given
+   *       <br>then:
    *       <ul>
    *         <li>2.1) If buffer is not the empty string, then:
    *           <ul>
@@ -1027,21 +1027,21 @@ class UrlParser {
    * <pre>
    * <ul>
    *   <li>1) If encoding is not UTF-8 and one of the following is true:
-   *     <br/>url is not special
-   *     <br/>url’s scheme is "ws" or "wss"
-   *     <br/>then set encoding to UTF-8.
+   *     <br>url is not special
+   *     <br>url’s scheme is "ws" or "wss"
+   *     <br>then set encoding to UTF-8.
    *   </li>
    *   <li>2) If one of the following is true:
-   *     <br/>state override is not given and c is U+0023 (#)
-   *     <br/>c is the EOF code point
-   *     <br/>then:
+   *     <br>state override is not given and c is U+0023 (#)
+   *     <br>c is the EOF code point
+   *     <br>then:
    *     <ul>
    *        <li>2.1) Let queryPercentEncodeSet be the special-query percent-encode set
    *        if url is special; otherwise the query percent-encode set.</li>
    *        <li>2.2) Percent-encode after encoding, with encoding, buffer,
    *        and queryPercentEncodeSet, and append the result to url’s query.
-   *        <br/>
-   *        <br/>This operation cannot be invoked code-point-for-code-point due
+   *        <br>
+   *        <br>This operation cannot be invoked code-point-for-code-point due
    *        to the stateful ISO-2022-JP encoder.
    *        </li>
    *        <li>2.3) Set buffer to the empty string.</li>
@@ -1212,7 +1212,7 @@ class UrlParser {
    *   and decrease pointer by 1.
    *   <li>3) Otherwise, return failure.
    * </ul>
-   * <br/>This indication of failure is used exclusively by the Location object’s protocol setter.
+   * <br>This indication of failure is used exclusively by the Location object’s protocol setter.
    * </pre>
    **/
   private StateReturnType schemeStartState() {
@@ -1286,9 +1286,9 @@ class UrlParser {
    *   state to no scheme state, and start over (from the first code point in input).
    *   <li>4) Otherwise, return failure.
    * </ul>
-   * <br/>This indication of failure is used exclusively by the Location object’s protocol setter.
-   * <br/>Furthermore, the non-failure termination earlier in this state is an intentional difference for
-   * <br/>defining that setter.
+   * <br>This indication of failure is used exclusively by the Location object’s protocol setter.
+   * <br>Furthermore, the non-failure termination earlier in this state is an intentional difference for
+   * <br>defining that setter.
    * </pre>
    */
   private StateReturnType schemeState() {
