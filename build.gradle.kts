@@ -1,8 +1,15 @@
 plugins {
     `java-library`
+    // plugin that takes care of formatting source code
     id("com.diffplug.spotless") version "6.21.0"
+    // plugin that handles running Java Microbenchmark Harness
     id("me.champeau.jmh") version "0.7.1"
+    // plugin that handles versioning
     id("com.palantir.git-version") version "3.0.0"
+    // plugins to release on maven central
+    `maven-publish`
+    signing
+    id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
 }
 
 dependencies {
@@ -22,6 +29,8 @@ java {
         languageVersion.set(JavaLanguageVersion.of(8))
         vendor.set(JvmVendorSpec.ADOPTIUM)
     }
+    withSourcesJar()
+    withJavadocJar()
 }
 
 repositories {
@@ -42,4 +51,46 @@ spotless {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+
+            pom {
+                name.set(project.name)
+                description.set("<<Component Description>>")
+                url.set("https://github.com/stephanebastian/whatwg-url")
+                licenses {
+                    license {
+                        name.set("Apache-2.0")
+                        url.set("https://opensource.org/licenses/Apache-2.0")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("stephanebastian")
+                        name.set("Stephane Bastian")
+                        email.set("stephane.bastian.dev@gmail.com")
+                    }
+                }
+                scm {
+                    url.set("https://github.com/stephanebastian/whatwg-url.git")
+                    connection.set("scm:git:git://github.com/stephanebastian/whatwg-url.git")
+                    developerConnection.set("scm:git:git://github.com/stephanebastian/whatwg-url.git")
+                }
+            }
+        }
+    }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype()
+    }
+}
+
+signing {
+    sign(publishing.publications["mavenJava"])
 }
