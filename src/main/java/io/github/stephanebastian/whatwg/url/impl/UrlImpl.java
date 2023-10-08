@@ -45,9 +45,11 @@ public class UrlImpl implements Url {
     UrlParser parser = new UrlParser();
     UrlImpl parsedBaseUrl = null;
     if (baseUrl != null) {
-      parsedBaseUrl = parser.basicParse(baseUrl, null, null);
+      parsedBaseUrl = parser.basicParse(baseUrl, null, null, err -> {
+      });
     }
-    return parser.basicParse(input, parsedBaseUrl, null);
+    return parser.basicParse(input, parsedBaseUrl, null, err -> {
+    });
   }
 
   void appendFragment(String fragment) {
@@ -135,7 +137,8 @@ public class UrlImpl implements Url {
     fragment = "";
     // 4
     try {
-      new UrlParser().basicParse(value, null, null, this, State.FRAGMENT);
+      new UrlParser().basicParse(value, null, null, this, State.FRAGMENT, err -> {
+      });
     } catch (Exception ignored) {
     }
     return this;
@@ -181,7 +184,8 @@ public class UrlImpl implements Url {
       return this;
     }
     try {
-      new UrlParser().basicParse(value, null, null, this, State.HOST);
+      new UrlParser().basicParse(value, null, null, this, State.HOST, err -> {
+      });
     } catch (Exception ignored) {
     }
     return this;
@@ -218,7 +222,8 @@ public class UrlImpl implements Url {
       return this;
     }
     try {
-      new UrlParser().basicParse(value, null, null, this, State.HOSTNAME);
+      new UrlParser().basicParse(value, null, null, this, State.HOSTNAME, err -> {
+      });
     } catch (Exception ignored) {
     }
     return this;
@@ -341,7 +346,8 @@ public class UrlImpl implements Url {
     path.clear();
     // 3
     try {
-      new UrlParser().basicParse(value, null, null, this, State.PATH_START);
+      new UrlParser().basicParse(value, null, null, this, State.PATH_START, err -> {
+      });
     } catch (Exception ignored) {
     }
     return this;
@@ -384,7 +390,8 @@ public class UrlImpl implements Url {
     // 3
     else {
       try {
-        new UrlParser().basicParse(value, null, null, this, State.PORT);
+        new UrlParser().basicParse(value, null, null, this, State.PORT, err -> {
+        });
       } catch (Exception ignored) {
       }
     }
@@ -446,7 +453,8 @@ public class UrlImpl implements Url {
   public Url protocol(String value) {
     Objects.requireNonNull(value);
     try {
-      new UrlParser().basicParse(value + ":", null, null, this, State.SCHEME_START);
+      new UrlParser().basicParse(value + ":", null, null, this, State.SCHEME_START, err -> {
+      });
     } catch (Exception e) {
     }
     return this;
@@ -509,7 +517,8 @@ public class UrlImpl implements Url {
     query = "";
     // 5
     try {
-      new UrlParser().basicParse(value, null, null, this, State.QUERY);
+      new UrlParser().basicParse(value, null, null, this, State.QUERY, err -> {
+      });
     } catch (Exception ignored) {
     }
     return this;

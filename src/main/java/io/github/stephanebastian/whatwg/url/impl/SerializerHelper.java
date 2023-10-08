@@ -308,8 +308,9 @@ public class SerializerHelper {
         StringBuilder serializedPath = new StringBuilder();
         serializePath(url, serializedPath);
         try {
-          UrlImpl pathUrl =
-              new UrlParser().basicParse(serializedPath.toString(), null, StandardCharsets.UTF_8);
+          UrlImpl pathUrl = new UrlParser().basicParse(serializedPath.toString(), null,
+              StandardCharsets.UTF_8, err -> {
+              });
           // 4
           if ("http".equals(pathUrl.scheme) || "https".equals(pathUrl.scheme)
               || "file".equals(pathUrl.scheme)) {
