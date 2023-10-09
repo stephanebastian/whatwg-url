@@ -168,4 +168,12 @@ public class TestUrlApi {
     url.username("ausername");
     Assertions.assertThat(url.username()).isEqualTo("ausername");
   }
+
+  @Test
+  public void validationErrors() {
+    Url url = Url.create(" \t http://www.myurl.com/path1?a=1&b=2#hash1");
+    Assertions.assertThat(url).isNotNull();
+    Assertions.assertThat(url.validationErrors()).isNotNull();
+    Assertions.assertThat(url.validationErrors().size()).isEqualTo(1);
+  }
 }

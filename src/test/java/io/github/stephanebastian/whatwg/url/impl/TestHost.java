@@ -1,7 +1,11 @@
 package io.github.stephanebastian.whatwg.url.impl;
 
 import io.github.stephanebastian.whatwg.url.Url;
+import io.github.stephanebastian.whatwg.url.ValidationError;
+import io.github.stephanebastian.whatwg.url.ValidationException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -69,7 +73,7 @@ public class TestHost {
     Assertions.assertThat(HostParser.parse("[0:0::1]", true, error -> {
     })).isInstanceOf(Ipv6Address.class).hasToString("::1");
     // failure
-    Assertions.assertThatExceptionOfType(UrlException.class)
+    Assertions.assertThatExceptionOfType(ValidationException.class)
         .isThrownBy(() -> HostParser.parse("xn--", false, error -> {
         }));
   }
@@ -86,11 +90,11 @@ public class TestHost {
   @MethodSource("invalidIpv4Data")
   public void testInvalidIpv4Data(Map<String, String> testData) {
     String ip = testData.get("ip");
-    Assertions.assertThatExceptionOfType(UrlException.class).isThrownBy(() -> {
-      ErrorHandler errorHandler = new ErrorHandler();
-      Ipv4Address result = HostParser.parseIpv4(ip, errorHandler::error);
-      Assertions.assertThat(!errorHandler.errors().isEmpty() || result == null).isTrue();
-      Assertions.assertThat(errorHandler.errors().size()).isGreaterThan(0);
+    Assertions.assertThatExceptionOfType(ValidationException.class).isThrownBy(() -> {
+      List<ValidationError> errors = new ArrayList<>();
+      Ipv4Address result = HostParser.parseIpv4(ip, errors::add);
+      Assertions.assertThat(!errors.isEmpty() || result == null).isTrue();
+      Assertions.assertThat(errors.size()).isGreaterThan(0);
     });
   }
 
@@ -98,7 +102,7 @@ public class TestHost {
   @MethodSource("invalidIpv6Data")
   public void testInvalidIpv6(Map<String, String> testData) {
     String ip = testData.get("ip");
-    Assertions.assertThatExceptionOfType(UrlException.class)
+    Assertions.assertThatExceptionOfType(ValidationException.class)
         .isThrownBy(() -> HostParser.parseIpv6(ip));
   }
 
@@ -108,13 +112,9 @@ public class TestHost {
     String ip = testData.get("ip");
     String ipExpected = testData.get("expected");
     Assertions.assertThatNoException().isThrownBy(() -> {
-      ErrorHandler errorHandler = new ErrorHandler();
-      Ipv4Address result = HostParser.parseIpv4(ip, errorHandler::error);
+      Ipv4Address result = HostParser.parseIpv4(ip, error -> {
+      });
       Assertions.assertThat(result).isNotNull();
-      // Commented out as those are not actual errors but rather validation
-      // information. Errors are
-      // thrown as exception
-      // Assert.assertEquals(0, validationErrors.size());
       StringBuilder formattedIp = new StringBuilder();
       SerializerHelper.serializeHost(result, formattedIp);
       Assertions.assertThat(formattedIp.toString()).isEqualTo(ipExpected);

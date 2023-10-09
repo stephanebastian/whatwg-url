@@ -2,6 +2,8 @@ package io.github.stephanebastian.whatwg.url.impl;
 
 import io.github.stephanebastian.whatwg.url.Url;
 import io.github.stephanebastian.whatwg.url.UrlSearchParams;
+import io.github.stephanebastian.whatwg.url.ValidationError;
+import io.github.stephanebastian.whatwg.url.ValidationException;
 import io.github.stephanebastian.whatwg.url.impl.UrlParser.State;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
@@ -33,11 +35,12 @@ public class UrlImpl implements Url {
   private UrlSearchParamsImpl searchParams;
   // lets cache the utf8Encoder
   private CharsetEncoder utf8Encoder;
+  private Collection<ValidationError> validationErrors;
 
   UrlImpl() {
   }
 
-  public static Url create(String input, String baseUrl) throws UrlException {
+  public static Url create(String input, String baseUrl) {
     if (input == null && baseUrl == null) {
       return new UrlImpl();
     }
@@ -595,6 +598,19 @@ public class UrlImpl implements Url {
     path(url);
   }
 
+  @Override
+  public Collection<ValidationError> validationErrors() {
+    return validationErrors != null ? validationErrors : Collections.emptyList();
+  }
+
+  public void validationError(ValidationError error) {
+    Objects.requireNonNull(error);
+    if (validationErrors == null) {
+      validationErrors = new ArrayList<>();
+    }
+    validationErrors.add(error);
+  }
+
   private CharsetEncoder utf8Encoder() {
     if (utf8Encoder == null) {
       utf8Encoder = StandardCharsets.UTF_8.newEncoder();
@@ -616,7 +632,7 @@ public class UrlImpl implements Url {
       for (List<String> innerSequence : sequence) {
         // 1
         if (innerSequence.size() != 2) {
-          throw UrlException._SEARCH_PARAMS_INIT;
+          throw new ValidationException(ValidationError._SEARCH_PARAMS_INIT);
         }
         // 2
         append(innerSequence.get(0), innerSequence.get(1));

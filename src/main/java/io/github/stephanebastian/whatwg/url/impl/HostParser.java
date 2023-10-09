@@ -1,5 +1,7 @@
 package io.github.stephanebastian.whatwg.url.impl;
 
+import io.github.stephanebastian.whatwg.url.ValidationError;
+import io.github.stephanebastian.whatwg.url.ValidationException;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
@@ -105,13 +107,12 @@ public class HostParser {
    * @param errorHandler the error handler
    * @return the Host
    */
-  static Host parse(String input, boolean isNotSpecial, Consumer<UrlException> errorHandler)
-      throws UrlException {
+  static Host parse(String input, boolean isNotSpecial, Consumer<ValidationError> errorHandler) {
     // 1
     if (input.startsWith("[")) {
       // 1.1
       if (!input.endsWith("]")) {
-        throw UrlException.IPV6_UNCLOSED;
+        throw new ValidationException(ValidationError.IPV6_UNCLOSED);
       } else {
         return parseIpv6(input.substring(1, input.length() - 1));
       }
@@ -127,7 +128,7 @@ public class HostParser {
     String asciiDomain = UrlHelper.domainToAscii(domain, false);
     // 7
     if (hasForbiddenDomainCodepoints(asciiDomain)) {
-      throw UrlException.DOMAIN_INVALID_CODEPOINT;
+      throw new ValidationException(ValidationError.DOMAIN_INVALID_CODEPOINT);
     }
     // 8
     if (endsInANumber(asciiDomain)) {
@@ -183,14 +184,13 @@ public class HostParser {
    * @param errorHandler the error handler
    * @return the {@link Ipv4Address}
    */
-  static Ipv4Address parseIpv4(String input, Consumer<UrlException> errorHandler)
-      throws UrlException {
+  static Ipv4Address parseIpv4(String input, Consumer<ValidationError> errorHandler) {
     // 1
     List<String> parts = InfraHelper.strictSplit(input, '.');
     // 2
     if (parts.isEmpty() || parts.get(parts.size() - 1).isEmpty()) {
       // 2.1
-      errorHandler.accept(UrlException.IPV4_EMPTY_PART);
+      errorHandler.accept(ValidationError.IPV4_EMPTY_PART);
       // 2.2
       if (parts.size() > 1) {
         parts.remove(parts.size() - 1);
@@ -198,7 +198,7 @@ public class HostParser {
     }
     // 3
     if (parts.size() > 4) {
-      throw UrlException.IPV4_TOO_MANY_PARTS;
+      throw new ValidationException(ValidationError.IPV4_TOO_MANY_PARTS);
     }
     // 4
     int[] numbers = new int[parts.size()];
@@ -210,31 +210,31 @@ public class HostParser {
         Map.Entry<Integer, Boolean> parsedNumber = parseIpv4Number(part);
         // 5.3
         if (parsedNumber.getValue()) {
-          errorHandler.accept(UrlException.IPV4_NON_DECIMAL_PART);
+          errorHandler.accept(ValidationError.IPV4_NON_DECIMAL_PART);
         }
         // 5.4
         numbers[i] = parsedNumber.getKey();
       } catch (Exception e) {
         // 5.2
-        throw UrlException.IPV4_NON_NUMERIC_PART;
+        throw new ValidationException(ValidationError.IPV4_NON_NUMERIC_PART);
       }
     }
     // 6
     for (int number : numbers) {
       if (number > 255) {
-        errorHandler.accept(UrlException.IPV4_OUT_OF_RANGE_PART);
+        errorHandler.accept(ValidationError.IPV4_OUT_OF_RANGE_PART);
         break;
       }
     }
     // 7
     for (int i = 0; i < numbers.length - 1; i++) {
       if (numbers[i] > 255 && i < numbers.length - 1) {
-        throw UrlException.IPV4_OUT_OF_RANGE_PART;
+        throw new ValidationException(ValidationError.IPV4_OUT_OF_RANGE_PART);
       }
     }
     // 8
     if (numbers[numbers.length - 1] >= Math.pow(256, (5 - numbers.length))) {
-      throw UrlException.IPV4_OUT_OF_RANGE_PART;
+      throw new ValidationException(ValidationError.IPV4_OUT_OF_RANGE_PART);
     }
     // 9
     int ipv4 = numbers[numbers.length - 1];
@@ -284,11 +284,11 @@ public class HostParser {
    * @return a tuple whose key is the parsed number and the value is a boolean indicating whether a
    *         validation error occurred
    */
-  static Map.Entry<Integer, Boolean> parseIpv4Number(String input) throws UrlException {
+  static Map.Entry<Integer, Boolean> parseIpv4Number(String input) {
     Objects.requireNonNull(input);
     // 1
     if (input.isEmpty()) {
-      throw UrlException._IPV4_NUMBER_PARSER;
+      throw new ValidationException(ValidationError._IPV4_NUMBER_PARSER);
     }
     // 2
     boolean validationError = false;
@@ -319,7 +319,7 @@ public class HostParser {
     // 7
     for (int i = 0; i < input.length(); i++) {
       if (Character.digit(input.codePointAt(i), radix) == -1) {
-        throw UrlException._IPV4_NUMBER_PARSER;
+        throw new ValidationException(ValidationError._IPV4_NUMBER_PARSER);
       }
     }
     try {
@@ -328,7 +328,7 @@ public class HostParser {
       // 9
       return new AbstractMap.SimpleEntry<Integer, Boolean>(output, validationError);
     } catch (Throwable t) {
-      throw UrlException._IPV4_NUMBER_PARSER;
+      throw new ValidationException(ValidationError._IPV4_NUMBER_PARSER);
     }
   }
 
@@ -441,7 +441,7 @@ public class HostParser {
    * @param input the string value to parse as an ipv6 address
    * @return
    */
-  static Ipv6Address parseIpv6(String input) throws UrlException {
+  static Ipv6Address parseIpv6(String input) {
     // 1
     short[] address = new short[8];
     // 2
@@ -455,7 +455,7 @@ public class HostParser {
       // 5.1
       if (!UrlHelper.remainingMatch(input, pointer, 1,
           (idx, cp) -> cp == CodepointHelper.CP_COLON)) {
-        throw UrlException.IPV6_INVALID_COMPRESSION;
+        throw new ValidationException(ValidationError.IPV6_INVALID_COMPRESSION);
       }
       // 5.2
       pointer += 2;
@@ -467,13 +467,13 @@ public class HostParser {
     while ((UrlHelper.codePoint(input, pointer)) != CodepointHelper.CP_EOF) {
       // 6.1
       if (pieceIndex == 8) {
-        throw UrlException.IPV6_TOO_MANY_PIECES;
+        throw new ValidationException(ValidationError.IPV6_TOO_MANY_PIECES);
       }
       // 6.2
       if (UrlHelper.codePoint(input, pointer) == CodepointHelper.CP_COLON) {
         // 6.2.1
         if (compress != null) {
-          throw UrlException.IPV6_MULTIPLE_COMPRESSION;
+          throw new ValidationException(ValidationError.IPV6_MULTIPLE_COMPRESSION);
         }
         // 6.2.2
         pointer++;
@@ -494,13 +494,13 @@ public class HostParser {
       if (UrlHelper.codePoint(input, pointer) == CodepointHelper.CP_PERIOD) {
         // 6.5.1
         if (length == 0) {
-          throw UrlException.IPV6_INVALID_CODEPOINT;
+          throw new ValidationException(ValidationError.IPV6_INVALID_CODEPOINT);
         }
         // 6.5.2
         pointer = pointer - length;
         // 6.5.3
         if (pieceIndex > 6) {
-          throw UrlException.IPV6_TOO_MANY_PIECES;
+          throw new ValidationException(ValidationError.IPV6_TOO_MANY_PIECES);
         }
         // 6.5.4
         int numberSeen = 0;
@@ -515,12 +515,12 @@ public class HostParser {
               // 6.5.5.2.1
               pointer++;
             } else {
-              throw UrlException.IPV6_INVALID_CODEPOINT;
+              throw new ValidationException(ValidationError.IPV6_INVALID_CODEPOINT);
             }
           }
           // 6.5.5.3
           if (!InfraHelper.isAsciiDigit(UrlHelper.codePoint(input, pointer))) {
-            throw UrlException.IPV6_INVALID_CODEPOINT;
+            throw new ValidationException(ValidationError.IPV6_INVALID_CODEPOINT);
           }
           // 6.5.5.4
           while (InfraHelper.isAsciiDigit(UrlHelper.codePoint(input, pointer))) {
@@ -530,13 +530,13 @@ public class HostParser {
             if (ipv4Piece == null) {
               ipv4Piece = number;
             } else if (ipv4Piece == 0) {
-              throw UrlException.IPV6_INVALID_CODEPOINT;
+              throw new ValidationException(ValidationError.IPV6_INVALID_CODEPOINT);
             } else {
               ipv4Piece = (short) (ipv4Piece * 10 + number);
             }
             // 6.5.5.4.3
             if (ipv4Piece > 255) {
-              throw UrlException.IPV4_OUT_OF_RANGE_PART;
+              throw new ValidationException(ValidationError.IPV4_OUT_OF_RANGE_PART);
             }
             // 6.5.5.4.4
             pointer++;
@@ -552,7 +552,7 @@ public class HostParser {
         }
         // 6.5.6
         if (numberSeen != 4) {
-          throw UrlException.IPV4_IN_IPV6_TOO_FEW_PARTS;
+          throw new ValidationException(ValidationError.IPV4_IN_IPV6_TOO_FEW_PARTS);
         }
         // 6.5.7
         break;
@@ -563,12 +563,12 @@ public class HostParser {
         pointer++;
         // 6.6.2
         if (UrlHelper.codePoint(input, pointer) == CodepointHelper.CP_EOF) {
-          throw UrlException.IPV6_INVALID_CODEPOINT;
+          throw new ValidationException(ValidationError.IPV6_INVALID_CODEPOINT);
         }
       }
       // 6.7
       else if (UrlHelper.codePoint(input, pointer) != CodepointHelper.CP_EOF) {
-        throw UrlException.IPV6_INVALID_CODEPOINT;
+        throw new ValidationException(ValidationError.IPV6_INVALID_CODEPOINT);
       }
       // 6.8
       address[pieceIndex] = (short) value;
@@ -593,7 +593,7 @@ public class HostParser {
     }
     // 8
     else if (compress == null && pieceIndex != 8) {
-      throw UrlException.IPV6_TOO_FEW_PIECES;
+      throw new ValidationException(ValidationError.IPV6_TOO_FEW_PIECES);
     }
     return Ipv6Address.create(address);
   }
@@ -614,23 +614,22 @@ public class HostParser {
    * </ul>
    * </pre>
    */
-  static Host parseOpaqueHost(String input, Consumer<UrlException> errorHandler)
-      throws UrlException {
+  static Host parseOpaqueHost(String input, Consumer<ValidationError> errorHandler) {
     for (int i = 0; i < input.length(); i++) {
       int codePoint = input.codePointAt(i);
       // 1
       if (CodepointHelper.isForbiddenHostCodePoint(codePoint)) {
-        throw UrlException.HOST_INVALID_CODEPOINT;
+        throw new ValidationException(ValidationError.HOST_INVALID_CODEPOINT);
       }
       // 2
       if (!CodepointHelper.isUrlCodepoint(codePoint) && codePoint != CodepointHelper.CP_PERCENT) {
-        errorHandler.accept(UrlException.INVALID_URL_UNIT);
+        errorHandler.accept(ValidationError.INVALID_URL_UNIT);
       }
       // 3
       if (codePoint == CodepointHelper.CP_PERCENT
           && !InfraHelper.isAsciiHexDigit(UrlHelper.codePoint(input, i + 1))
           && !InfraHelper.isAsciiHexDigit(UrlHelper.codePoint(input, i + 2))) {
-        errorHandler.accept(UrlException.INVALID_URL_UNIT);
+        errorHandler.accept(ValidationError.INVALID_URL_UNIT);
       }
     }
     // 4

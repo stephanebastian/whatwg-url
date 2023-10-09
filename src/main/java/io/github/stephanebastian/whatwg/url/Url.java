@@ -1,8 +1,7 @@
 package io.github.stephanebastian.whatwg.url;
 
-import io.github.stephanebastian.whatwg.url.impl.UrlException;
 import io.github.stephanebastian.whatwg.url.impl.UrlImpl;
-import java.util.function.Consumer;
+import java.util.Collection;
 
 /**
  * This is the main interface of the project. It closely follows
@@ -50,25 +49,7 @@ public interface Url {
    * @return a new Url
    */
   static Url create(String input, String baseUrl) {
-    return create(input, baseUrl, null);
-  }
-
-  /**
-   * Create a new Url from the specified input, base url and error handler. <br>
-   * Note that this method is not defined by the spec but provide an easy way <br>
-   * of reporting potential errors
-   *
-   * @param input the input to parse and create an Url from
-   * @param baseUrl the base url
-   * @param errorHandler the error handler to register
-   * @return new Url
-   */
-  static Url create(String input, String baseUrl, Consumer<String> errorHandler) {
-    try {
-      return UrlImpl.create(input, baseUrl);
-    } catch (UrlException e) {
-      throw new RuntimeException(e);
-    }
+    return UrlImpl.create(input, baseUrl);
   }
 
   /**
@@ -235,4 +216,12 @@ public interface Url {
    * @return a reference to this to support a fluent api
    */
   Url username(String value);
+
+  /**
+   * Return a collection of validation errors reported when parsing the raw url and/or setting properties
+   * Note that this method is not explicitly specified by the WhatWg Url standard
+   *
+   * @return a collection of validation errors
+   */
+  Collection<ValidationError> validationErrors();
 }

@@ -1,6 +1,8 @@
 package io.github.stephanebastian.whatwg.url.impl;
 
 import com.ibm.icu.text.IDNA;
+import io.github.stephanebastian.whatwg.url.ValidationError;
+import io.github.stephanebastian.whatwg.url.ValidationException;
 import java.io.ByteArrayOutputStream;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -98,11 +100,11 @@ class UrlHelper {
       if (IDNA.Error.EMPTY_LABEL.equals(error)) {
         continue;
       }
-      throw UrlException.DOMAIN_TO_ASCII;
+      throw new ValidationException(ValidationError.DOMAIN_TO_ASCII);
     }
     // 3
     if (result.length() == 0) {
-      throw UrlException.DOMAIN_TO_ASCII;
+      throw new ValidationException(ValidationError.DOMAIN_TO_ASCII);
     }
     // 4
     return result.toString();
@@ -140,13 +142,13 @@ class UrlHelper {
         uts46NonStrictInstance.nameToUnicode(domain, result, idnaInfo);
       }
       if (result.length() == 0) {
-        throw UrlException.DOMAIN_TO_ASCII;
+        throw new ValidationException(ValidationError.DOMAIN_TO_ASCII);
       }
       // 4
       return result.toString();
     } catch (Exception e) {
       // 2
-      throw UrlException.DOMAIN_TO_ASCII;
+      throw new ValidationException(ValidationError.DOMAIN_TO_ASCII);
     }
   }
 

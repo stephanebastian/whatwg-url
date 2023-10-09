@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 public class TestCodePoints {
   @Test
   public void codepointAt() {
-    ErrorHandler errorHandler = new ErrorHandler();
     Codepoints input = new Codepoints("A B C D");
     Assertions.assertThat(input.length()).isEqualTo(7);
     Assertions.assertThat(input.remaining()).isEqualTo(7);
@@ -37,7 +36,6 @@ public class TestCodePoints {
 
   @Test
   public void remainingMatch() {
-    ErrorHandler errorHandler = new ErrorHandler();
     Codepoints input = new Codepoints("A B C D");
     Assertions.assertThat(input.length()).isEqualTo(7);
     Assertions.assertThat(input.remaining()).isEqualTo(7);

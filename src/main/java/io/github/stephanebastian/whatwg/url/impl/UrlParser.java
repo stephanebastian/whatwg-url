@@ -1,5 +1,7 @@
 package io.github.stephanebastian.whatwg.url.impl;
 
+import io.github.stephanebastian.whatwg.url.ValidationError;
+import io.github.stephanebastian.whatwg.url.ValidationException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
@@ -23,7 +25,6 @@ class UrlParser {
   private Codepoints input;
   private boolean passwordTokenSeenFlag;
   private State state;
-  private ErrorHandler errorHandler;
   private UrlImpl base;
   private Charset encoding;
   private CharsetEncoder encoder;
@@ -73,11 +74,11 @@ class UrlParser {
    * </ul>
    * </pre>
    */
-  private StateReturnType authorityState() throws UrlException {
+  private StateReturnType authorityState() {
     // 1
     if (input.codepointIs(CodepointHelper.CP_AT)) {
       // 1.1
-      errorHandler.error(UrlException.INVALID_CREDENTIALS);
+      url.validationError(ValidationError.INVALID_CREDENTIALS);
       // 1.2
       if (atSignSeenFlag) {
         prependToBuffer("%40");
@@ -112,7 +113,7 @@ class UrlParser {
         || (url.isSpecial() && input.codepointIs(CodepointHelper.CP_BACKSLASH))) {
       // 2.1
       if (atSignSeenFlag && buffer().length() == 0) {
-        throw UrlException.INVALID_CREDENTIALS;
+        throw new ValidationException(ValidationError.INVALID_CREDENTIALS);
       } else {
         // 2.2
         input.decreasePointerBy((int) buffer().codePoints().count() + 1);
@@ -162,7 +163,7 @@ class UrlParser {
    * </pre>
    */
   public UrlImpl basicParse(String input, UrlImpl base, Charset encoding, UrlImpl url,
-      State stateOverride) throws UrlException {
+      State stateOverride) {
     Objects.requireNonNull(input);
     logger.log(Level.FINER, () -> "starting basicParse - input : " + input + " - base: " + base
         + " - encoding: " + encoding + " - stateOverride: " + stateOverride);
@@ -171,7 +172,6 @@ class UrlParser {
     // note that the spec indicates that basicParse takes a scalar value String (basically where
     // surrogates have been replaced)
     codepoints = InfraHelper.toScalarCodepoints(codepoints);
-    this.errorHandler = new ErrorHandler();
     this.base = base;
     // 1
     if (url == null) {
@@ -179,7 +179,7 @@ class UrlParser {
       url = new UrlImpl();
       // 1.2
       if (UrlHelper.hasLeadingOrTrailingC0ControlOrSpace(codepoints)) {
-        errorHandler.error(UrlException.INVALID_URL_UNIT);
+        url.validationError(ValidationError.INVALID_URL_UNIT);
         // 1.3
         codepoints = UrlHelper.removeLeadingOrTrailingC0ControlOrSpace(codepoints);
       }
@@ -187,7 +187,7 @@ class UrlParser {
     this.url = url;
     // 2
     if (UrlHelper.hasAsciiTabOrNewline(codepoints)) {
-      errorHandler.error(UrlException.INVALID_URL_UNIT);
+      url.validationError(ValidationError.INVALID_URL_UNIT);
       // 3
       codepoints = UrlHelper.removeAsciiTabAndNewline(codepoints);
     }
@@ -205,12 +205,6 @@ class UrlParser {
     this.passwordTokenSeenFlag = false;
     // 8
     this.input = new Codepoints(codepoints);
-    // 10 already done by codePoints
-    // TODO: remove this once the spec is clear as to what to do when there is no
-    // content
-    // if (this.input.length() == 0) {
-    // state(stateOverride != null ? stateOverride : State.RELATIVE);
-    // }
     // 9
     stateMachine();
     return this.url;
@@ -224,7 +218,7 @@ class UrlParser {
    * result of resolving the blob URL url, if that did not return failure, and null otherwise. 5)
    * Return url.
    */
-  public UrlImpl basicParse(String input, UrlImpl baseUrl, Charset encoding) throws UrlException {
+  public UrlImpl basicParse(String input, UrlImpl baseUrl, Charset encoding) {
     return basicParse(input, baseUrl, encoding, null, null);
   }
 
@@ -278,14 +272,14 @@ class UrlParser {
    * </ul>
    * </pre>
    */
-  private StateReturnType fileHostState() throws UrlException {
+  private StateReturnType fileHostState() {
     // 1
     if (input.codepointIsOneOf(CodepointHelper.CP_EOF, CodepointHelper.CP_SLASH,
         CodepointHelper.CP_BACKSLASH, CodepointHelper.CP_QUESTION_MARK, CodepointHelper.CP_HASH)) {
       input.decreasePointerByOne();
       // 1.1
       if (stateOverride == null && UrlHelper.isWindowsDriveLetter(buffer().toString(), 0)) {
-        errorHandler.error(UrlException.FILE_INVALID_WINDOWS_DRIVE_LETTER_HOST);
+        url.validationError(ValidationError.FILE_INVALID_WINDOWS_DRIVE_LETTER_HOST);
         state(State.PATH);
       }
       // 1.2
@@ -303,7 +297,7 @@ class UrlParser {
       else {
         // 1.3.1
         // 1.3.2
-        Host host = HostParser.parse(buffer().toString(), !url.isSpecial(), errorHandler::error);
+        Host host = HostParser.parse(buffer().toString(), !url.isSpecial(), url::validationError);
         // 1.3.3
         if (host instanceof Domain && "localhost".equals(((Domain) host).host())) {
           host = EmptyHost.create();
@@ -358,7 +352,7 @@ class UrlParser {
     if (input.codepointIsOneOf(CodepointHelper.CP_SLASH, CodepointHelper.CP_BACKSLASH)) {
       // 1.1
       if (input.codepointIs(CodepointHelper.CP_BACKSLASH)) {
-        errorHandler.error(UrlException.INVALID_REVERSE_SOLIDUS);
+        url.validationError(ValidationError.INVALID_REVERSE_SOLIDUS);
       }
       // 1.2
       state(State.FILE_HOST);
@@ -432,7 +426,7 @@ class UrlParser {
     if (input.codepointIsOneOf(CodepointHelper.CP_SLASH, CodepointHelper.CP_BACKSLASH)) {
       // 3.1
       if (input.codepointIs(CodepointHelper.CP_BACKSLASH)) {
-        errorHandler.error(UrlException.INVALID_REVERSE_SOLIDUS);
+        url.validationError(ValidationError.INVALID_REVERSE_SOLIDUS);
       }
       // 3.2
       state(State.FILE_SLASH);
@@ -464,7 +458,7 @@ class UrlParser {
         // 4.4.3
         else {
           // 4.4.3.1
-          errorHandler.error(UrlException.FILE_INVALID_WINDOWS_DRIVE_LETTER);
+          url.validationError(ValidationError.FILE_INVALID_WINDOWS_DRIVE_LETTER);
           // 4.4.3.2
           url.path.clear();
         }
@@ -504,12 +498,12 @@ class UrlParser {
       // 1.1
       if (!CodepointHelper.isUrlCodepoint(input.codepoint())
           && input.codepoint() != CodepointHelper.CP_PERCENT) {
-        errorHandler.error(UrlException.INVALID_URL_UNIT);
+        url.validationError(ValidationError.INVALID_URL_UNIT);
       }
       // 1.2
       if (input.codepointIs(CodepointHelper.CP_PERCENT)
           && input.remainingMatch(2, (idx, cp) -> InfraHelper.isAsciiHexDigit(cp))) {
-        errorHandler.error(UrlException.INVALID_URL_UNIT);
+        url.validationError(ValidationError.INVALID_URL_UNIT);
       }
       // 1.3
       String utf8PercentEncode = UrlHelper.utf8PercentEncode(utf8Encoder(), input.codepoint(),
@@ -558,7 +552,7 @@ class UrlParser {
    *   </ul>
    * </pre>
    */
-  private StateReturnType hostState() throws UrlException {
+  private StateReturnType hostState() {
     // 1
     if (stateOverride != null && "file".equals(url.scheme)) {
       input.decreasePointerByOne();
@@ -568,14 +562,14 @@ class UrlParser {
     else if (input.codepointIs(CodepointHelper.CP_COLON) && !insideBracketsFlag) {
       // 2.1
       if (buffer().length() == 0) {
-        throw UrlException.HOST_MISSING;
+        throw new ValidationException(ValidationError.HOST_MISSING);
       }
       // 2.2
       if (State.HOSTNAME.equals(stateOverride)) {
         return StateReturnType.RETURN;
       }
       // 2.3, 2.4, 2.5
-      url.host = HostParser.parse(buffer().toString(), !url.isSpecial(), errorHandler::error);
+      url.host = HostParser.parse(buffer().toString(), !url.isSpecial(), url::validationError);
       clearBuffer();
       state(State.PORT);
     }
@@ -586,7 +580,7 @@ class UrlParser {
       input.decreasePointerByOne();
       // 3.1
       if (url.isSpecial() && buffer().length() == 0) {
-        throw UrlException.HOST_MISSING;
+        throw new ValidationException(ValidationError.HOST_MISSING);
       }
       // 3.2
       else if (stateOverride != null && buffer().length() == 0
@@ -594,7 +588,7 @@ class UrlParser {
         return StateReturnType.RETURN;
       }
       // 3.3, 3.4, 3.5
-      url.host = HostParser.parse(buffer().toString(), !url.isSpecial(), errorHandler::error);
+      url.host = HostParser.parse(buffer().toString(), !url.isSpecial(), url::validationError);
       clearBuffer();
       state(State.PATH_START);
       // 3.6
@@ -618,7 +612,7 @@ class UrlParser {
     return StateReturnType.CONTINUE;
   }
 
-  private StateReturnType hostnameState() throws UrlException {
+  private StateReturnType hostnameState() {
     return hostState();
   }
 
@@ -655,10 +649,10 @@ class UrlParser {
    * </ul>
    * </pre>
    */
-  private StateReturnType noSchemeState() throws UrlException {
+  private StateReturnType noSchemeState() {
     // 1
     if (base == null || (base.hasAnOpaquePath() && input.codepointIsNot(CodepointHelper.CP_HASH))) {
-      throw UrlException.MISSING_SCHEME_NON_RELATIVE_URL;
+      throw new ValidationException(ValidationError.MISSING_SCHEME_NON_RELATIVE_URL);
     }
     // 2
     else if (base.hasAnOpaquePath() && input.codepointIs(CodepointHelper.CP_HASH)) {
@@ -718,12 +712,12 @@ class UrlParser {
       // 3.1
       if (!input.isEof() && CodepointHelper.isUrlCodepoint(input.codepoint())
           && input.codepointIsNot(CodepointHelper.CP_PERCENT)) {
-        errorHandler.error(UrlException.INVALID_URL_UNIT);
+        url.validationError(ValidationError.INVALID_URL_UNIT);
       }
       // 3.2
       if (input.codepointIs(CodepointHelper.CP_PERCENT)
           && input.remainingMatch(2, (pos, cp) -> InfraHelper.isAsciiHexDigit(cp))) {
-        errorHandler.error(UrlException.INVALID_URL_UNIT);
+        url.validationError(ValidationError.INVALID_URL_UNIT);
       }
       // 3.3
       if (!input.isEof()) {
@@ -786,7 +780,7 @@ class UrlParser {
     if (url.isSpecial()) {
       // 1.1
       if (input.codepointIs(CodepointHelper.CP_BACKSLASH)) {
-        errorHandler.error(UrlException.INVALID_REVERSE_SOLIDUS);
+        url.validationError(ValidationError.INVALID_REVERSE_SOLIDUS);
       }
       // 1.2
       state(State.PATH);
@@ -883,7 +877,7 @@ class UrlParser {
             CodepointHelper.CP_HASH)))) {
       // 1.1
       if (url.isSpecial() && input.codepoint() == CodepointHelper.CP_BACKSLASH /* \ */) {
-        errorHandler.error(UrlException.INVALID_REVERSE_SOLIDUS);
+        url.validationError(ValidationError.INVALID_REVERSE_SOLIDUS);
       }
       // 1.2
       if (UrlHelper.isDoubleDotPathSegment(buffer())) {
@@ -931,12 +925,12 @@ class UrlParser {
       // 2.1
       if (!CodepointHelper.isUrlCodepoint(input.codepoint())
           && input.codepointIsNot(CodepointHelper.CP_PERCENT)) {
-        errorHandler.error(UrlException.INVALID_URL_UNIT);
+        url.validationError(ValidationError.INVALID_URL_UNIT);
       }
       // 2.2
       if (input.codepointIs(CodepointHelper.CP_PERCENT)
           && !input.remainingMatch(2, (idx, cp) -> InfraHelper.isAsciiHexDigit(cp))) {
-        errorHandler.error(UrlException.INVALID_URL_UNIT);
+        url.validationError(ValidationError.INVALID_URL_UNIT);
       }
       // 2.3
       buffer.append(UrlHelper.utf8PercentEncode(utf8Encoder(), input.codepoint(),
@@ -971,7 +965,7 @@ class UrlParser {
    *   </ul>
    * </pre>
    */
-  private StateReturnType portState() throws UrlException {
+  private StateReturnType portState() {
     // 1
     if (InfraHelper.isAsciiDigit(input.codepoint())) {
       appendToBuffer(input.codepoint());
@@ -987,7 +981,7 @@ class UrlParser {
         Integer port = Integer.valueOf(buffer().toString(), 10);
         // 2.1.2
         if (port > 65535) {
-          throw UrlException.PORT_OUT_OF_RANGE;
+          throw new ValidationException(ValidationError.PORT_OUT_OF_RANGE);
         }
         // 2.1.3
         Integer defaultPort = UrlHelper.getDefaultSchemePort(url.scheme);
@@ -1009,7 +1003,7 @@ class UrlParser {
     }
     // 3
     else {
-      throw UrlException.PORT_INVALID;
+      throw new ValidationException(ValidationError.PORT_INVALID);
     }
     return StateReturnType.CONTINUE;
   }
@@ -1088,12 +1082,12 @@ class UrlParser {
     else if (input.codepointIsNot(CodepointHelper.CP_EOF)) {
       // 3.1
       if (!CodepointHelper.isUrlCodepoint(input.codepoint())) {
-        errorHandler.error(UrlException.INVALID_URL_UNIT);
+        url.validationError(ValidationError.INVALID_URL_UNIT);
       }
       // 3.2
       if (input.codepointIs(CodepointHelper.CP_PERCENT)
           && !input.remainingMatch(2, (idx, cp) -> InfraHelper.isAsciiHexDigit(cp))) {
-        errorHandler.error(UrlException.INVALID_URL_UNIT);
+        url.validationError(ValidationError.INVALID_URL_UNIT);
       }
       // 3.3
       appendToBuffer(input.codepoint());
@@ -1121,7 +1115,7 @@ class UrlParser {
         && (input.codepointIsOneOf(CodepointHelper.CP_SLASH, CodepointHelper.CP_BACKSLASH))) {
       // 1.1
       if (input.codepointIs(CodepointHelper.CP_BACKSLASH)) {
-        errorHandler.error(UrlException.INVALID_REVERSE_SOLIDUS);
+        url.validationError(ValidationError.INVALID_REVERSE_SOLIDUS);
       }
       // 1.2
       state(State.SPECIAL_AUTHORITY_IGNORE_SLASHES);
@@ -1174,7 +1168,7 @@ class UrlParser {
     }
     // 4
     else if (url.isSpecial() && input.codepointIs(CodepointHelper.CP_BACKSLASH)) {
-      errorHandler.error(UrlException.INVALID_REVERSE_SOLIDUS);
+      url.validationError(ValidationError.INVALID_REVERSE_SOLIDUS);
       state(State.RELATIVE_SLASH);
     }
     // 5
@@ -1229,7 +1223,7 @@ class UrlParser {
       return StateReturnType.CONTINUE;
     }
     // 3
-    throw UrlException.INVALID_SCHEME;
+    throw new ValidationException(ValidationError._INVALID_SCHEME);
   }
 
   /**
@@ -1334,7 +1328,7 @@ class UrlParser {
       // 2.5
       if ("file".equals(url.scheme)) {
         if (!input.remainingMatch(2, (idx, cp) -> cp == CodepointHelper.CP_SLASH)) {
-          errorHandler.error(UrlException.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
+          url.validationError(ValidationError.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
         }
         state(State.FILE);
       }
@@ -1366,7 +1360,7 @@ class UrlParser {
       return StateReturnType.CONTINUE;
     }
     // 4
-    throw UrlException.INVALID_SCHEME;
+    throw new ValidationException(ValidationError._INVALID_SCHEME);
   }
 
   /**
@@ -1383,7 +1377,7 @@ class UrlParser {
       state(State.AUTHORITY);
       input.decreasePointerByOne();
     } else {
-      errorHandler.error(UrlException.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
+      url.validationError(ValidationError.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
     }
     return StateReturnType.CONTINUE;
   }
@@ -1405,7 +1399,7 @@ class UrlParser {
     }
     // 2
     else {
-      errorHandler.error(UrlException.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
+      url.validationError(ValidationError.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
       state(State.SPECIAL_AUTHORITY_IGNORE_SLASHES);
       input.decreasePointerByOne();
     }
@@ -1429,7 +1423,7 @@ class UrlParser {
       state(State.SPECIAL_AUTHORITY_IGNORE_SLASHES);
       input.increasePointerByOne();
     } else {
-      errorHandler.error(UrlException.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
+      url.validationError(ValidationError.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
       state(State.RELATIVE);
       input.decreasePointerByOne();
     }
@@ -1444,7 +1438,7 @@ class UrlParser {
     this.state = Objects.requireNonNull(state);
   }
 
-  protected void stateMachine() throws UrlException {
+  protected void stateMachine() {
     logger.log(Level.FINER, () -> "Starting state machine - position: " + input.pointer()
         + " - base: " + base + " - state override: " + stateOverride);
     while (true) {
