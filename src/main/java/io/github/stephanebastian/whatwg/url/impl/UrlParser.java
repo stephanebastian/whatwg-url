@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.function.IntPredicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,7 +23,7 @@ class UrlParser {
   private Codepoints input;
   private boolean passwordTokenSeenFlag;
   private State state;
-  private Consumer<UrlException> errorHandler;
+  private ErrorHandler errorHandler;
   private UrlImpl base;
   private Charset encoding;
   private CharsetEncoder encoder;
@@ -78,7 +77,7 @@ class UrlParser {
     // 1
     if (input.codepointIs(CodepointHelper.CP_AT)) {
       // 1.1
-      errorHandler.accept(UrlException.INVALID_CREDENTIALS);
+      errorHandler.error(UrlException.INVALID_CREDENTIALS);
       // 1.2
       if (atSignSeenFlag) {
         prependToBuffer("%40");
@@ -163,9 +162,8 @@ class UrlParser {
    * </pre>
    */
   public UrlImpl basicParse(String input, UrlImpl base, Charset encoding, UrlImpl url,
-      State stateOverride, Consumer<UrlException> errorHandler) throws UrlException {
+      State stateOverride) throws UrlException {
     Objects.requireNonNull(input);
-    Objects.requireNonNull(errorHandler);
     logger.log(Level.FINER, () -> "starting basicParse - input : " + input + " - base: " + base
         + " - encoding: " + encoding + " - stateOverride: " + stateOverride);
     // easier to deal with the codepoint array than using String
@@ -173,7 +171,7 @@ class UrlParser {
     // note that the spec indicates that basicParse takes a scalar value String (basically where
     // surrogates have been replaced)
     codepoints = InfraHelper.toScalarCodepoints(codepoints);
-    this.errorHandler = errorHandler;
+    this.errorHandler = new ErrorHandler();
     this.base = base;
     // 1
     if (url == null) {
@@ -181,7 +179,7 @@ class UrlParser {
       url = new UrlImpl();
       // 1.2
       if (UrlHelper.hasLeadingOrTrailingC0ControlOrSpace(codepoints)) {
-        errorHandler.accept(UrlException.INVALID_URL_UNIT);
+        errorHandler.error(UrlException.INVALID_URL_UNIT);
         // 1.3
         codepoints = UrlHelper.removeLeadingOrTrailingC0ControlOrSpace(codepoints);
       }
@@ -189,7 +187,7 @@ class UrlParser {
     this.url = url;
     // 2
     if (UrlHelper.hasAsciiTabOrNewline(codepoints)) {
-      errorHandler.accept(UrlException.INVALID_URL_UNIT);
+      errorHandler.error(UrlException.INVALID_URL_UNIT);
       // 3
       codepoints = UrlHelper.removeAsciiTabAndNewline(codepoints);
     }
@@ -226,9 +224,8 @@ class UrlParser {
    * result of resolving the blob URL url, if that did not return failure, and null otherwise. 5)
    * Return url.
    */
-  public UrlImpl basicParse(String input, UrlImpl baseUrl, Charset encoding,
-      Consumer<UrlException> errorHandler) throws UrlException {
-    return basicParse(input, baseUrl, encoding, null, null, errorHandler);
+  public UrlImpl basicParse(String input, UrlImpl baseUrl, Charset encoding) throws UrlException {
+    return basicParse(input, baseUrl, encoding, null, null);
   }
 
   protected StringBuilder buffer() {
@@ -288,7 +285,7 @@ class UrlParser {
       input.decreasePointerByOne();
       // 1.1
       if (stateOverride == null && UrlHelper.isWindowsDriveLetter(buffer().toString(), 0)) {
-        errorHandler.accept(UrlException.FILE_INVALID_WINDOWS_DRIVE_LETTER_HOST);
+        errorHandler.error(UrlException.FILE_INVALID_WINDOWS_DRIVE_LETTER_HOST);
         state(State.PATH);
       }
       // 1.2
@@ -306,7 +303,7 @@ class UrlParser {
       else {
         // 1.3.1
         // 1.3.2
-        Host host = HostParser.parse(buffer().toString(), !url.isSpecial(), errorHandler::accept);
+        Host host = HostParser.parse(buffer().toString(), !url.isSpecial(), errorHandler::error);
         // 1.3.3
         if (host instanceof Domain && "localhost".equals(((Domain) host).host())) {
           host = EmptyHost.create();
@@ -361,7 +358,7 @@ class UrlParser {
     if (input.codepointIsOneOf(CodepointHelper.CP_SLASH, CodepointHelper.CP_BACKSLASH)) {
       // 1.1
       if (input.codepointIs(CodepointHelper.CP_BACKSLASH)) {
-        errorHandler.accept(UrlException.INVALID_REVERSE_SOLIDUS);
+        errorHandler.error(UrlException.INVALID_REVERSE_SOLIDUS);
       }
       // 1.2
       state(State.FILE_HOST);
@@ -435,7 +432,7 @@ class UrlParser {
     if (input.codepointIsOneOf(CodepointHelper.CP_SLASH, CodepointHelper.CP_BACKSLASH)) {
       // 3.1
       if (input.codepointIs(CodepointHelper.CP_BACKSLASH)) {
-        errorHandler.accept(UrlException.INVALID_REVERSE_SOLIDUS);
+        errorHandler.error(UrlException.INVALID_REVERSE_SOLIDUS);
       }
       // 3.2
       state(State.FILE_SLASH);
@@ -467,7 +464,7 @@ class UrlParser {
         // 4.4.3
         else {
           // 4.4.3.1
-          errorHandler.accept(UrlException.FILE_INVALID_WINDOWS_DRIVE_LETTER);
+          errorHandler.error(UrlException.FILE_INVALID_WINDOWS_DRIVE_LETTER);
           // 4.4.3.2
           url.path.clear();
         }
@@ -507,12 +504,12 @@ class UrlParser {
       // 1.1
       if (!CodepointHelper.isUrlCodepoint(input.codepoint())
           && input.codepoint() != CodepointHelper.CP_PERCENT) {
-        errorHandler.accept(UrlException.INVALID_URL_UNIT);
+        errorHandler.error(UrlException.INVALID_URL_UNIT);
       }
       // 1.2
       if (input.codepointIs(CodepointHelper.CP_PERCENT)
           && input.remainingMatch(2, (idx, cp) -> InfraHelper.isAsciiHexDigit(cp))) {
-        errorHandler.accept(UrlException.INVALID_URL_UNIT);
+        errorHandler.error(UrlException.INVALID_URL_UNIT);
       }
       // 1.3
       String utf8PercentEncode = UrlHelper.utf8PercentEncode(utf8Encoder(), input.codepoint(),
@@ -578,7 +575,7 @@ class UrlParser {
         return StateReturnType.RETURN;
       }
       // 2.3, 2.4, 2.5
-      url.host = HostParser.parse(buffer().toString(), !url.isSpecial(), errorHandler::accept);
+      url.host = HostParser.parse(buffer().toString(), !url.isSpecial(), errorHandler::error);
       clearBuffer();
       state(State.PORT);
     }
@@ -597,7 +594,7 @@ class UrlParser {
         return StateReturnType.RETURN;
       }
       // 3.3, 3.4, 3.5
-      url.host = HostParser.parse(buffer().toString(), !url.isSpecial(), errorHandler::accept);
+      url.host = HostParser.parse(buffer().toString(), !url.isSpecial(), errorHandler::error);
       clearBuffer();
       state(State.PATH_START);
       // 3.6
@@ -721,12 +718,12 @@ class UrlParser {
       // 3.1
       if (!input.isEof() && CodepointHelper.isUrlCodepoint(input.codepoint())
           && input.codepointIsNot(CodepointHelper.CP_PERCENT)) {
-        errorHandler.accept(UrlException.INVALID_URL_UNIT);
+        errorHandler.error(UrlException.INVALID_URL_UNIT);
       }
       // 3.2
       if (input.codepointIs(CodepointHelper.CP_PERCENT)
           && input.remainingMatch(2, (pos, cp) -> InfraHelper.isAsciiHexDigit(cp))) {
-        errorHandler.accept(UrlException.INVALID_URL_UNIT);
+        errorHandler.error(UrlException.INVALID_URL_UNIT);
       }
       // 3.3
       if (!input.isEof()) {
@@ -789,7 +786,7 @@ class UrlParser {
     if (url.isSpecial()) {
       // 1.1
       if (input.codepointIs(CodepointHelper.CP_BACKSLASH)) {
-        errorHandler.accept(UrlException.INVALID_REVERSE_SOLIDUS);
+        errorHandler.error(UrlException.INVALID_REVERSE_SOLIDUS);
       }
       // 1.2
       state(State.PATH);
@@ -886,7 +883,7 @@ class UrlParser {
             CodepointHelper.CP_HASH)))) {
       // 1.1
       if (url.isSpecial() && input.codepoint() == CodepointHelper.CP_BACKSLASH /* \ */) {
-        errorHandler.accept(UrlException.INVALID_REVERSE_SOLIDUS);
+        errorHandler.error(UrlException.INVALID_REVERSE_SOLIDUS);
       }
       // 1.2
       if (UrlHelper.isDoubleDotPathSegment(buffer())) {
@@ -934,12 +931,12 @@ class UrlParser {
       // 2.1
       if (!CodepointHelper.isUrlCodepoint(input.codepoint())
           && input.codepointIsNot(CodepointHelper.CP_PERCENT)) {
-        errorHandler.accept(UrlException.INVALID_URL_UNIT);
+        errorHandler.error(UrlException.INVALID_URL_UNIT);
       }
       // 2.2
       if (input.codepointIs(CodepointHelper.CP_PERCENT)
           && !input.remainingMatch(2, (idx, cp) -> InfraHelper.isAsciiHexDigit(cp))) {
-        errorHandler.accept(UrlException.INVALID_URL_UNIT);
+        errorHandler.error(UrlException.INVALID_URL_UNIT);
       }
       // 2.3
       buffer.append(UrlHelper.utf8PercentEncode(utf8Encoder(), input.codepoint(),
@@ -1091,12 +1088,12 @@ class UrlParser {
     else if (input.codepointIsNot(CodepointHelper.CP_EOF)) {
       // 3.1
       if (!CodepointHelper.isUrlCodepoint(input.codepoint())) {
-        errorHandler.accept(UrlException.INVALID_URL_UNIT);
+        errorHandler.error(UrlException.INVALID_URL_UNIT);
       }
       // 3.2
       if (input.codepointIs(CodepointHelper.CP_PERCENT)
           && !input.remainingMatch(2, (idx, cp) -> InfraHelper.isAsciiHexDigit(cp))) {
-        errorHandler.accept(UrlException.INVALID_URL_UNIT);
+        errorHandler.error(UrlException.INVALID_URL_UNIT);
       }
       // 3.3
       appendToBuffer(input.codepoint());
@@ -1124,7 +1121,7 @@ class UrlParser {
         && (input.codepointIsOneOf(CodepointHelper.CP_SLASH, CodepointHelper.CP_BACKSLASH))) {
       // 1.1
       if (input.codepointIs(CodepointHelper.CP_BACKSLASH)) {
-        errorHandler.accept(UrlException.INVALID_REVERSE_SOLIDUS);
+        errorHandler.error(UrlException.INVALID_REVERSE_SOLIDUS);
       }
       // 1.2
       state(State.SPECIAL_AUTHORITY_IGNORE_SLASHES);
@@ -1177,7 +1174,7 @@ class UrlParser {
     }
     // 4
     else if (url.isSpecial() && input.codepointIs(CodepointHelper.CP_BACKSLASH)) {
-      errorHandler.accept(UrlException.INVALID_REVERSE_SOLIDUS);
+      errorHandler.error(UrlException.INVALID_REVERSE_SOLIDUS);
       state(State.RELATIVE_SLASH);
     }
     // 5
@@ -1337,7 +1334,7 @@ class UrlParser {
       // 2.5
       if ("file".equals(url.scheme)) {
         if (!input.remainingMatch(2, (idx, cp) -> cp == CodepointHelper.CP_SLASH)) {
-          errorHandler.accept(UrlException.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
+          errorHandler.error(UrlException.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
         }
         state(State.FILE);
       }
@@ -1386,7 +1383,7 @@ class UrlParser {
       state(State.AUTHORITY);
       input.decreasePointerByOne();
     } else {
-      errorHandler.accept(UrlException.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
+      errorHandler.error(UrlException.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
     }
     return StateReturnType.CONTINUE;
   }
@@ -1408,7 +1405,7 @@ class UrlParser {
     }
     // 2
     else {
-      errorHandler.accept(UrlException.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
+      errorHandler.error(UrlException.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
       state(State.SPECIAL_AUTHORITY_IGNORE_SLASHES);
       input.decreasePointerByOne();
     }
@@ -1432,7 +1429,7 @@ class UrlParser {
       state(State.SPECIAL_AUTHORITY_IGNORE_SLASHES);
       input.increasePointerByOne();
     } else {
-      errorHandler.accept(UrlException.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
+      errorHandler.error(UrlException.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
       state(State.RELATIVE);
       input.decreasePointerByOne();
     }
