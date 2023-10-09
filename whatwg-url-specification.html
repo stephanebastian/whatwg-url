@@ -10,7 +10,7 @@
     <link crossorigin href="https://resources.whatwg.org/logo-url.svg" rel="icon">
     <script async crossorigin src="https://resources.whatwg.org/file-issue.js"></script>
     <script crossorigin defer src="https://resources.whatwg.org/commit-snapshot-shortcut-key.js"></script>
-    <meta content="Bikeshed version 6edc88947, updated Thu Aug 17 11:18:09 2023 -0700" name="generator">
+    <meta content="Bikeshed version 82ce88815, updated Thu Sep 7 16:33:55 2023 -0700" name="generator">
     <style>
         .yesno .yes { background: papayawhip; }
 .yesno .yes, .yesno .no { text-align: center; }
@@ -468,16 +468,16 @@ var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
     <a class="logo" href="https://whatwg.org/"> <img alt="WHATWG" crossorigin height="100" src="https://resources.whatwg.org/logo-url.svg"> </a>
     <hgroup>
         <h1 class="p-name no-ref allcaps" id="title">URL</h1>
-        <p id="subtitle">Living Standard — Last Updated <time class="dt-updated" datetime="2023-08-21">21 August 2023</time> </p>
+        <p id="subtitle">Living Standard — Last Updated <time class="dt-updated" datetime="2023-09-27">27 September 2023</time> </p>
     </hgroup>
     <div data-fill-with="spec-metadata">
         <dl>
             <dt>Participate:
-            <dd><a href="https://github.com/whatwg/url">GitHub whatwg/url</a> (<a href="https://github.com/whatwg/url/issues/new">new issue</a>, <a href="https://github.com/whatwg/url/issues">open issues</a>)
+            <dd><a href="https://github.com/whatwg/url">GitHub whatwg/url</a> (<a href="https://github.com/whatwg/url/issues/new/choose">new issue</a>, <a href="https://github.com/whatwg/url/issues">open issues</a>)
             <dd><a href="https://whatwg.org/chat">Chat on Matrix</a>
             <dt>Commits:
             <dd><a href="https://github.com/whatwg/url/commits">GitHub whatwg/url/commits</a>
-            <dd><a href="/commit-snapshots/d2ca75f1a7f295a1798048d401c8b73fc252b324/" id="commit-snapshot-link">Snapshot as of this commit</a>
+            <dd><a href="/commit-snapshots/aa64bb27d427cef0d87f134980ac762cced1f5bb/" id="commit-snapshot-link">Snapshot as of this commit</a>
             <dd><a href="https://twitter.com/urlstandard">@urlstandard</a>
             <dt>Tests:
             <dd><a href="https://github.com/web-platform-tests/wpt/tree/master/url">web-platform-tests url/</a> (<a href="https://github.com/web-platform-tests/wpt/labels/url">ongoing work</a>)
@@ -815,9 +815,9 @@ var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
                 <div class="example" id="example-invalid-credentials">
                     <a class="self-link" href="#example-invalid-credentials"></a>
                     <p>"<code>https://user@example.org</code>" </p>
-                    <p>"<code>https://user:pass@</code>" </p>
+                    <p>"<code>ssh://user@example.org</code>" </p>
                 </div>
-            <td class="yes">Yes<br>(only if there is no host)
+            <td class="no">·
         <tr>
             <td><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="host-missing">host-missing</dfn>
             <td>
@@ -826,6 +826,7 @@ var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
                     <a class="self-link" href="#example-host-missing"></a>
                     <p>"<code>https://#fragment</code>" </p>
                     <p>"<code>https://:443</code>" </p>
+                    <p>"<code>https://user:pass@</code>" </p>
                 </div>
             <td class="yes">Yes
         <tr>
@@ -1080,13 +1081,13 @@ var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
     <div class="example" id="example-host-parsing">
         <a class="self-link" href="#example-host-parsing"></a>
         <p>A <a data-link-type="dfn" href="#concept-host-parser" id="ref-for-concept-host-parser⑤">parse</a>-<a data-link-type="dfn" href="#concept-host-serializer" id="ref-for-concept-host-serializer③">serialize</a> roundtrip gives the
-            following results, depending on the <var>isNotSpecial</var> argument to the <a data-link-type="dfn" href="#concept-host-parser" id="ref-for-concept-host-parser⑥">host parser</a>: </p>
+            following results, depending on the <var>isOpaque</var> argument to the <a data-link-type="dfn" href="#concept-host-parser" id="ref-for-concept-host-parser⑥">host parser</a>: </p>
         <table>
             <tbody>
             <tr>
                 <th>Input
-                <th>Output (<var>isNotSpecial</var> = false)
-                <th>Output (<var>isNotSpecial</var> = true)
+                <th>Output (<var>isOpaque</var> = false)
+                <th>Output (<var>isOpaque</var> = true)
             <tr>
                 <td><code>EXAMPLE.COM</code>
                 <td rowspan="2"><code>example.com</code> (<a data-link-type="dfn" href="#concept-domain" id="ref-for-concept-domain">domain</a>)
@@ -1318,7 +1319,8 @@ var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
         to be distinguished. </p>
     <h3 class="heading settled" data-level="3.5" id="host-parsing"><span class="secno">3.5. </span><span class="content">Host parsing</span><a class="self-link" href="#host-parsing"></a></h3>
     <div class="algorithm" data-algorithm="host parser">
-        <p>The <dfn class="dfn-paneled" data-dfn-type="dfn" data-export data-lt="host parser|host parsing" id="concept-host-parser">host parser</dfn> takes a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#scalar-value-string" id="ref-for-scalar-value-string④">scalar value string</a> <var>input</var> with an optional boolean <var>isNotSpecial</var> (default false), and then runs these steps. They return failure or a <a data-link-type="dfn" href="#concept-host" id="ref-for-concept-host①②">host</a>. </p>
+        <p>The <dfn class="dfn-paneled" data-dfn-type="dfn" data-export data-lt="host parser|host parsing" id="concept-host-parser">host parser</dfn> takes a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#scalar-value-string" id="ref-for-scalar-value-string④">scalar value string</a> <var>input</var> with an optional boolean <var>isOpaque</var> (default
+            false), and then runs these steps. They return failure or a <a data-link-type="dfn" href="#concept-host" id="ref-for-concept-host①②">host</a>. </p>
         <ol>
             <li>
                 <p>If <var>input</var> starts with U+005B ([), then: </p>
@@ -1330,7 +1332,7 @@ var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
                             leading U+005B ([) and trailing U+005D (]) removed. </p>
                 </ol>
             <li>
-                <p>If <var>isNotSpecial</var> is true, then return the result of <a data-link-type="dfn" href="#concept-opaque-host-parser" id="ref-for-concept-opaque-host-parser">opaque-host parsing</a> <var>input</var>. </p>
+                <p>If <var>isOpaque</var> is true, then return the result of <a data-link-type="dfn" href="#concept-opaque-host-parser" id="ref-for-concept-opaque-host-parser">opaque-host parsing</a> <var>input</var>. </p>
             <li>
                 <p>Assert: <var>input</var> is not the empty string. </p>
             <li>
@@ -2279,8 +2281,8 @@ var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
                                     <p>Otherwise, if <var>url</var> <a data-link-type="dfn" href="#is-special" id="ref-for-is-special②">is special</a>, <var>base</var> is non-null, and <var>base</var>’s <a data-link-type="dfn" href="#concept-url-scheme" id="ref-for-concept-url-scheme①⑨">scheme</a> is <var>url</var>’s <a data-link-type="dfn" href="#concept-url-scheme" id="ref-for-concept-url-scheme②⓪">scheme</a>: </p>
                                     <ol>
                                         <li>
-                                            <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#assert" id="ref-for-assert①">Assert</a>: <var>base</var> is <a data-link-type="dfn" href="#is-special" id="ref-for-is-special③">is special</a> (and therefore does not
-                                                have an <a data-link-type="dfn" href="#url-opaque-path" id="ref-for-url-opaque-path④">opaque path</a>). </p>
+                                            <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#assert" id="ref-for-assert①">Assert</a>: <var>base</var> <a data-link-type="dfn" href="#is-special" id="ref-for-is-special③">is special</a> (and therefore does not have
+                                                an <a data-link-type="dfn" href="#url-opaque-path" id="ref-for-url-opaque-path④">opaque path</a>). </p>
                                         <li>
                                             <p>Set <var>state</var> to <a data-link-type="dfn" href="#special-relative-or-authority-state" id="ref-for-special-relative-or-authority-state">special relative or authority state</a>. </p>
                                     </ol>
@@ -2434,7 +2436,7 @@ var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
                             <p>then: </p>
                             <ol>
                                 <li>
-                                    <p>If <var>atSignSeen</var> is true and <var>buffer</var> is the empty string, <a data-link-type="dfn" href="#invalid-credentials" id="ref-for-invalid-credentials①">invalid-credentials</a> <a data-link-type="dfn" href="#validation-error" id="ref-for-validation-error④①">validation error</a>, return failure. </p>
+                                    <p>If <var>atSignSeen</var> is true and <var>buffer</var> is the empty string, <a data-link-type="dfn" href="#host-missing" id="ref-for-host-missing">host-missing</a> <a data-link-type="dfn" href="#validation-error" id="ref-for-validation-error④①">validation error</a>, return failure. </p>
                                 <li>
                                     <p>Decrease <var>pointer</var> by <var>buffer</var>’s <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string-code-point-length" id="ref-for-string-code-point-length①">code point length</a> + 1, set <var>buffer</var> to the empty string, and set <var>state</var> to <a data-link-type="dfn" href="#host-state" id="ref-for-host-state">host state</a>. </p>
                             </ol>
@@ -2452,7 +2454,7 @@ var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
                             <p>Otherwise, if <a data-link-type="dfn" href="#c" id="ref-for-c④②">c</a> is U+003A (:) and <var>insideBrackets</var> is false, then: </p>
                             <ol>
                                 <li>
-                                    <p>If <var>buffer</var> is the empty string, <a data-link-type="dfn" href="#host-missing" id="ref-for-host-missing">host-missing</a> <a data-link-type="dfn" href="#validation-error" id="ref-for-validation-error④②">validation error</a>,
+                                    <p>If <var>buffer</var> is the empty string, <a data-link-type="dfn" href="#host-missing" id="ref-for-host-missing①">host-missing</a> <a data-link-type="dfn" href="#validation-error" id="ref-for-validation-error④②">validation error</a>,
                                         return failure. </p>
                                 <li>
                                     <p>If <var>state override</var> is given and <var>state override</var> is <a data-link-type="dfn" href="#hostname-state" id="ref-for-hostname-state">hostname state</a>, then return. </p>
@@ -2475,7 +2477,7 @@ var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
                             <p>then decrease <var>pointer</var> by 1, and then: </p>
                             <ol>
                                 <li>
-                                    <p>If <var>url</var> <a data-link-type="dfn" href="#is-special" id="ref-for-is-special⑨">is special</a> and <var>buffer</var> is the empty string, <a data-link-type="dfn" href="#host-missing" id="ref-for-host-missing①">host-missing</a> <a data-link-type="dfn" href="#validation-error" id="ref-for-validation-error④③">validation error</a>, return failure. </p>
+                                    <p>If <var>url</var> <a data-link-type="dfn" href="#is-special" id="ref-for-is-special⑨">is special</a> and <var>buffer</var> is the empty string, <a data-link-type="dfn" href="#host-missing" id="ref-for-host-missing②">host-missing</a> <a data-link-type="dfn" href="#validation-error" id="ref-for-validation-error④③">validation error</a>, return failure. </p>
                                 <li>
                                     <p>Otherwise, if <var>state override</var> is given, <var>buffer</var> is the empty
                                         string, and either <var>url</var> <a data-link-type="dfn" href="#include-credentials" id="ref-for-include-credentials②">includes credentials</a> or <var>url</var>’s <a data-link-type="dfn" href="#concept-url-port" id="ref-for-concept-url-port⑧">port</a> is non-null, return. </p>
@@ -2875,7 +2877,7 @@ var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
             <p>Return <var>output</var>. </p>
     </ol>
     <p>The <dfn class="dfn-paneled" data-dfn-type="dfn" data-export data-lt="URL path serializer|URL path serializing" id="url-path-serializer">URL path serializer</dfn> takes a <a data-link-type="dfn" href="#concept-url" id="ref-for-concept-url④⑤">URL</a> <var>url</var> and then runs these steps. They return an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#ascii-string" id="ref-for-ascii-string②②">ASCII string</a>. </p>
-    <ul>
+    <ol>
         <li>
             <p>If <var>url</var> has an <a data-link-type="dfn" href="#url-opaque-path" id="ref-for-url-opaque-path⑧">opaque path</a>, then return <var>url</var>’s <a data-link-type="dfn" href="#concept-url-path" id="ref-for-concept-url-path②⑦">path</a>. </p>
         <li>
@@ -2885,7 +2887,7 @@ var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
                 U+002F (/) followed by <var>segment</var> to <var>output</var>. </p>
         <li>
             <p>Return <var>output</var>. </p>
-    </ul>
+    </ol>
     <h3 class="heading settled" data-level="4.6" id="url-equivalence"><span class="secno">4.6. </span><span class="content">URL equivalence</span><a class="self-link" href="#url-equivalence"></a></h3>
     <p>To determine whether a <a data-link-type="dfn" href="#concept-url" id="ref-for-concept-url④⑥">URL</a> <var>A</var> <dfn class="dfn-paneled" data-dfn-for="url" data-dfn-type="dfn" data-export data-lt="equal" id="concept-url-equals">equals</dfn> <a data-link-type="dfn" href="#concept-url" id="ref-for-concept-url④⑦">URL</a> <var>B</var>, with
         an optional boolean <dfn data-dfn-for="url/equals" data-dfn-type="dfn" data-export id="url-equals-exclude-fragments"><var>exclude fragments</var><a class="self-link" href="#url-equals-exclude-fragments"></a></dfn> (default false),
@@ -3536,6 +3538,7 @@ sorted<c- p>.</c->sort<c- p>()</c-></code></pre>
         Adam Barth,
         Addison Phillips,
         Adrián Chaves,
+        Adrien Ricciardi,
         Albert Wiersch,
         Alex Christensen,
         Alexis Hunt,
@@ -3586,6 +3589,7 @@ sorted<c- p>.</c->sort<c- p>()</c-></code></pre>
         Joshua Bell,
         Jxck,
         Karl Wagner,
+        Kemal Zebari,
         田村健人 (Kent TAMURA),
         Kevin Grandon,
         Kornel Lesiński,
@@ -4036,7 +4040,7 @@ if ("serviceWorker" in navigator) {
 <h3 class="no-num no-ref heading settled" id="normative"><span class="content">Normative References</span><a class="self-link" href="#normative"></a></h3>
 <dl>
     <dt id="biblio-bidi">[BIDI]
-    <dd>Mark Davis; Ken Whistler. <a href="https://www.unicode.org/reports/tr9/tr9-46.html"><cite>Unicode Bidirectional Algorithm</cite></a>. 16 August 2022. Unicode Standard Annex #9. URL: <a href="https://www.unicode.org/reports/tr9/tr9-46.html">https://www.unicode.org/reports/tr9/tr9-46.html</a>
+    <dd>Manish Goregaokar मनीष गोरेगांवकर; Robin Leroy. <a href="https://www.unicode.org/reports/tr9/tr9-48.html"><cite>Unicode Bidirectional Algorithm</cite></a>. 15 August 2023. Unicode Standard Annex #9. URL: <a href="https://www.unicode.org/reports/tr9/tr9-48.html">https://www.unicode.org/reports/tr9/tr9-48.html</a>
     <dt id="biblio-encoding">[ENCODING]
     <dd>Anne van Kesteren. <a href="https://encoding.spec.whatwg.org/"><cite>Encoding Standard</cite></a>. Living Standard. URL: <a href="https://encoding.spec.whatwg.org/">https://encoding.spec.whatwg.org/</a>
     <dt id="biblio-fileapi">[FILEAPI]
@@ -4052,7 +4056,7 @@ if ("serviceWorker" in navigator) {
     <dt id="biblio-rfc4291">[RFC4291]
     <dd>R. Hinden; S. Deering. <a href="https://www.rfc-editor.org/rfc/rfc4291"><cite>IP Version 6 Addressing Architecture</cite></a>. February 2006. Draft Standard. URL: <a href="https://www.rfc-editor.org/rfc/rfc4291">https://www.rfc-editor.org/rfc/rfc4291</a>
     <dt id="biblio-uts46">[UTS46]
-    <dd>Mark Davis; Michel Suignard. <a href="https://www.unicode.org/reports/tr46/tr46-29.html"><cite>Unicode IDNA Compatibility Processing</cite></a>. 26 August 2022. Unicode Technical Standard #46. URL: <a href="https://www.unicode.org/reports/tr46/tr46-29.html">https://www.unicode.org/reports/tr46/tr46-29.html</a>
+    <dd>Mark Davis; Michel Suignard. <a href="https://www.unicode.org/reports/tr46/tr46-31.html"><cite>Unicode IDNA Compatibility Processing</cite></a>. 5 September 2023. Unicode Technical Standard #46. URL: <a href="https://www.unicode.org/reports/tr46/tr46-31.html">https://www.unicode.org/reports/tr46/tr46-31.html</a>
     <dt id="biblio-webidl">[WEBIDL]
     <dd>Edgar Chen; Timothy Gu. <a href="https://webidl.spec.whatwg.org/"><cite>Web IDL Standard</cite></a>. Living Standard. URL: <a href="https://webidl.spec.whatwg.org/">https://webidl.spec.whatwg.org/</a>
 </dl>
@@ -4081,7 +4085,7 @@ if ("serviceWorker" in navigator) {
     <dt id="biblio-utr36">[UTR36]
     <dd>Mark Davis; Michel Suignard. <a href="https://www.unicode.org/reports/tr36/tr36-15.html"><cite>Unicode Security Considerations</cite></a>. 19 September 2014. Unicode Technical Report #36. URL: <a href="https://www.unicode.org/reports/tr36/tr36-15.html">https://www.unicode.org/reports/tr36/tr36-15.html</a>
     <dt id="biblio-uts39">[UTS39]
-    <dd>Mark Davis; Michel Suignard. <a href="https://www.unicode.org/reports/tr39/tr39-26.html"><cite>Unicode Security Mechanisms</cite></a>. 26 August 2022. Unicode Technical Standard #39. URL: <a href="https://www.unicode.org/reports/tr39/tr39-26.html">https://www.unicode.org/reports/tr39/tr39-26.html</a>
+    <dd>Mark Davis; Michel Suignard. <a href="https://www.unicode.org/reports/tr39/tr39-28.html"><cite>Unicode Security Mechanisms</cite></a>. 5 September 2023. Unicode Technical Standard #39. URL: <a href="https://www.unicode.org/reports/tr39/tr39-28.html">https://www.unicode.org/reports/tr39/tr39-28.html</a>
 </dl>
 <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL Index</span><a class="self-link" href="#idl-index"></a></h2>
 <pre class="idl highlight def">[Exposed=*,
@@ -5113,8 +5117,8 @@ window.dfnpanelData['invalid-url-unit'] = {"dfnID": "invalid-url-unit", "url": "
 window.dfnpanelData['special-scheme-missing-following-solidus'] = {"dfnID": "special-scheme-missing-following-solidus", "url": "#special-scheme-missing-following-solidus", "dfnText": "special-scheme-missing-following-solidus", "refSections": [{"refs": [{"id": "ref-for-special-scheme-missing-following-solidus"}, {"id": "ref-for-special-scheme-missing-following-solidus\u2460"}, {"id": "ref-for-special-scheme-missing-following-solidus\u2461"}, {"id": "ref-for-special-scheme-missing-following-solidus\u2462"}], "title": "4.4. URL parsing"}], "external": false};
 window.dfnpanelData['missing-scheme-non-relative-url'] = {"dfnID": "missing-scheme-non-relative-url", "url": "#missing-scheme-non-relative-url", "dfnText": "missing-scheme-non-relative-URL", "refSections": [{"refs": [{"id": "ref-for-missing-scheme-non-relative-url"}], "title": "4.4. URL parsing"}], "external": false};
 window.dfnpanelData['invalid-reverse-solidus'] = {"dfnID": "invalid-reverse-solidus", "url": "#invalid-reverse-solidus", "dfnText": "invalid-reverse-solidus", "refSections": [{"refs": [{"id": "ref-for-invalid-reverse-solidus"}, {"id": "ref-for-invalid-reverse-solidus\u2460"}, {"id": "ref-for-invalid-reverse-solidus\u2461"}, {"id": "ref-for-invalid-reverse-solidus\u2462"}, {"id": "ref-for-invalid-reverse-solidus\u2463"}, {"id": "ref-for-invalid-reverse-solidus\u2464"}], "title": "4.4. URL parsing"}], "external": false};
-window.dfnpanelData['invalid-credentials'] = {"dfnID": "invalid-credentials", "url": "#invalid-credentials", "dfnText": "invalid-credentials", "refSections": [{"refs": [{"id": "ref-for-invalid-credentials"}, {"id": "ref-for-invalid-credentials\u2460"}], "title": "4.4. URL parsing"}], "external": false};
-window.dfnpanelData['host-missing'] = {"dfnID": "host-missing", "url": "#host-missing", "dfnText": "host-missing", "refSections": [{"refs": [{"id": "ref-for-host-missing"}, {"id": "ref-for-host-missing\u2460"}], "title": "4.4. URL parsing"}], "external": false};
+window.dfnpanelData['invalid-credentials'] = {"dfnID": "invalid-credentials", "url": "#invalid-credentials", "dfnText": "invalid-credentials", "refSections": [{"refs": [{"id": "ref-for-invalid-credentials"}], "title": "4.4. URL parsing"}], "external": false};
+window.dfnpanelData['host-missing'] = {"dfnID": "host-missing", "url": "#host-missing", "dfnText": "host-missing", "refSections": [{"refs": [{"id": "ref-for-host-missing"}, {"id": "ref-for-host-missing\u2460"}, {"id": "ref-for-host-missing\u2461"}], "title": "4.4. URL parsing"}], "external": false};
 window.dfnpanelData['port-out-of-range'] = {"dfnID": "port-out-of-range", "url": "#port-out-of-range", "dfnText": "port-out-of-range", "refSections": [{"refs": [{"id": "ref-for-port-out-of-range"}], "title": "4.4. URL parsing"}], "external": false};
 window.dfnpanelData['port-invalid'] = {"dfnID": "port-invalid", "url": "#port-invalid", "dfnText": "port-invalid", "refSections": [{"refs": [{"id": "ref-for-port-invalid"}], "title": "4.4. URL parsing"}], "external": false};
 window.dfnpanelData['file-invalid-windows-drive-letter'] = {"dfnID": "file-invalid-windows-drive-letter", "url": "#file-invalid-windows-drive-letter", "dfnText": "file-invalid-Windows-drive-letter", "refSections": [{"refs": [{"id": "ref-for-file-invalid-windows-drive-letter"}], "title": "4.4. URL parsing"}], "external": false};

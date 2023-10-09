@@ -23,6 +23,32 @@ import java.util.Collection;
  */
 public interface Url {
   /**
+   * Return whether the given url can be parsed
+   *
+   * @param url the url to parse
+   * @return true if the url can be parsed, false otherwise
+   */
+  static boolean canParse(String url) {
+    return canParse(url, null);
+  }
+
+  /**
+   * Return whether the given url and baseUrl can be parsed
+   *
+   * @param url the url to parse
+   * @param baseUrl the baseUrl
+   * @return true if the url can be parsed, false otherwise
+   */
+  static boolean canParse(String url, String baseUrl) {
+    try {
+      create(url, baseUrl);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  /**
    * Create a new empty Url
    *
    * @return a new Url
@@ -201,6 +227,13 @@ public interface Url {
    * @return the {@link UrlSearchParams}
    */
   UrlSearchParams searchParams();
+
+  /**
+   * Return a Json representation of the url
+   *
+   * @return the json representation
+   */
+  String toJSON();
 
   /**
    * Return the username.

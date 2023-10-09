@@ -77,54 +77,49 @@ public class HostParser {
   }
 
   /**
-   * <pre>
-   *   The host parser takes a scalar value string input with an optional boolean
-   *   isNotSpecial (default false), and then runs these steps. They return failure or a host.
-   *   <ul>
-   *     <li>1) If input starts with U+005B ([), then:
-   *       <ul>
-   *         <li>1.1) If input does not end with U+005D (]), IPv6-unclosed validation error,
-   *         return failure.</li>
-   *         <li>1.2) Return the result of IPv6 parsing input with its leading U+005B ([)
-   *         and trailing U+005D (]) removed.</li>
-   *       </ul>
-   *     </li>
-   *     <li>2) If isNotSpecial is true, then return the result of opaque-host parsing input.</li>
-   *     <li>3) Assert: input is not the empty string.</li>
-   *     <li>4) Let domain be the result of running UTF-8 decode without BOM on the percent-decoding of input.
-   *     <br>Note: Alternatively UTF-8 decode without BOM or fail can be used, coupled with an early return for failure, as domain to ASCII fails on U+FFFD (�).
-   *     </li>
-   *     <li>5) Let asciiDomain be the result of running domain to ASCII with domain and false.</li>
-   *     <li>6) If asciiDomain is failure, then return failure.</li>
-   *     <li>7) If asciiDomain contains a forbidden domain code point, domain-invalid-code-point validation error, return failure.</li>
-   *     <li>8) If asciiDomain ends in a number, then return the result of IPv4 parsing asciiDomain.</li>
-   *     <li>9) Return asciiDomain.</li>
-   *   </ul>
-   * </pre>
+   * The host parser takes a scalar value string input with an optional boolean
+   * isOpaque (default false), and then runs these steps. They return failure or a host.
+   * <ul>
+   *   <li>1) If input starts with U+005B ([), then:
+   *     <ul>
+   *       <li>1.1) If input does not end with U+005D (]), IPv6-unclosed validation error, return failure.</li>
+   *       <li>1.2) Return the result of IPv6 parsing input with its leading U+005B ([) and trailing U+005D (]) removed.</li>
+   *     </ul>
+   *   </li>
+   *   <li>2) If isOpaque is true, then return the result of opaque-host parsing input.</li>
+   *   <li>3) Assert: input is not the empty string.</li>
+   *   <li>4) Let domain be the result of running UTF-8 decode without BOM on the percent-decoding of input.
+   *   Alternatively UTF-8 decode without BOM or fail can be used, coupled with an early return for failure, as domain to ASCII fails on U+FFFD (�).
+   *   </li>
+   *   <li>5) Let asciiDomain be the result of running domain to ASCII with domain and false.</li>
+   *   <li>6) If asciiDomain is failure, then return failure.</li>
+   *   <li>7) If asciiDomain contains a forbidden domain code point, domain-invalid-code-point validation error, return failure.</li>
+   *   <li>8) If asciiDomain ends in a number, then return the result of IPv4 parsing asciiDomain.</li>
+   *   <li>9) Return asciiDomain.</li>
+   * </ul>
    *
    * @param input the host to parse
-   * @param isNotSpecial a boolean indicating whether the host is not special
+   * @param isOpaque a boolean indicating whether the host is opaque
    * @param errorHandler the error handler
    * @return the Host
    */
-  static Host parse(String input, boolean isNotSpecial, Consumer<ValidationError> errorHandler) {
+  static Host parse(String input, boolean isOpaque, Consumer<ValidationError> errorHandler) {
     // 1
     if (input.startsWith("[")) {
       // 1.1
       if (!input.endsWith("]")) {
         throw new ValidationException(ValidationError.IPV6_UNCLOSED);
-      } else {
-        return parseIpv6(input.substring(1, input.length() - 1));
       }
+      return parseIpv6(input.substring(1, input.length() - 1));
     }
     // 2
-    if (isNotSpecial) {
+    if (isOpaque) {
       return parseOpaqueHost(input, errorHandler);
     }
     // 3
     // 4
     String domain = EncodingHelper.utf8DecodeWithoutBom(UrlHelper.percentDecode(input));
-    // 5
+    // 5, 6
     String asciiDomain = UrlHelper.domainToAscii(domain, false);
     // 7
     if (hasForbiddenDomainCodepoints(asciiDomain)) {

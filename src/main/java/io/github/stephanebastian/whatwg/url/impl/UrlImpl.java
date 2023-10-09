@@ -556,6 +556,11 @@ public class UrlImpl implements Url {
   }
 
   @Override
+  public String toJSON() {
+    return href();
+  }
+
+  @Override
   public String toString() {
     return href();
   }

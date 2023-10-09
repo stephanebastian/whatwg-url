@@ -65,7 +65,7 @@ class UrlParser {
    *    <br>then:
    *    <ul>
    *      <li>2.1) If atSignSeen is true and buffer is the empty string,
-   *      invalid-credentials validation error, return failure.</li>
+   *      host-missing validation error, return failure.</li>
    *      <li>2.2) Decrease pointer by buffer’s code point length + 1,
    *      set buffer to the empty string, and set state to host state.</li>
    *    </ul>
@@ -113,7 +113,7 @@ class UrlParser {
         || (url.isSpecial() && input.codepointIs(CodepointHelper.CP_BACKSLASH))) {
       // 2.1
       if (atSignSeenFlag && buffer().length() == 0) {
-        throw new ValidationException(ValidationError.INVALID_CREDENTIALS);
+        throw new ValidationException(ValidationError.HOST_MISSING);
       } else {
         // 2.2
         input.decreasePointerBy((int) buffer().codePoints().count() + 1);
