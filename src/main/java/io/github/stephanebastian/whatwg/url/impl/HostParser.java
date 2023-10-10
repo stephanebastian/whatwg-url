@@ -489,13 +489,13 @@ public class HostParser {
       if (UrlHelper.codePoint(input, pointer) == CodepointHelper.CP_PERIOD) {
         // 6.5.1
         if (length == 0) {
-          throw new ValidationException(ValidationError.IPV6_INVALID_CODEPOINT);
+          throw new ValidationException(ValidationError.IPV4_IN_IPV6_INVALID_CODEPOINT);
         }
         // 6.5.2
         pointer = pointer - length;
         // 6.5.3
         if (pieceIndex > 6) {
-          throw new ValidationException(ValidationError.IPV6_TOO_MANY_PIECES);
+          throw new ValidationException(ValidationError.IPV4_IN_IPV6_TOO_MANY_PIECES);
         }
         // 6.5.4
         int numberSeen = 0;
@@ -510,12 +510,13 @@ public class HostParser {
               // 6.5.5.2.1
               pointer++;
             } else {
-              throw new ValidationException(ValidationError.IPV6_INVALID_CODEPOINT);
+              // 6.5.5.2.2
+              throw new ValidationException(ValidationError.IPV4_IN_IPV6_INVALID_CODEPOINT);
             }
           }
           // 6.5.5.3
           if (!InfraHelper.isAsciiDigit(UrlHelper.codePoint(input, pointer))) {
-            throw new ValidationException(ValidationError.IPV6_INVALID_CODEPOINT);
+            throw new ValidationException(ValidationError.IPV4_IN_IPV6_INVALID_CODEPOINT);
           }
           // 6.5.5.4
           while (InfraHelper.isAsciiDigit(UrlHelper.codePoint(input, pointer))) {
@@ -525,13 +526,13 @@ public class HostParser {
             if (ipv4Piece == null) {
               ipv4Piece = number;
             } else if (ipv4Piece == 0) {
-              throw new ValidationException(ValidationError.IPV6_INVALID_CODEPOINT);
+              throw new ValidationException(ValidationError.IPV4_IN_IPV6_INVALID_CODEPOINT);
             } else {
               ipv4Piece = (short) (ipv4Piece * 10 + number);
             }
             // 6.5.5.4.3
             if (ipv4Piece > 255) {
-              throw new ValidationException(ValidationError.IPV4_OUT_OF_RANGE_PART);
+              throw new ValidationException(ValidationError.IPV4_IN_IPV6_OUT_OF_RANGE_PART);
             }
             // 6.5.5.4.4
             pointer++;
@@ -617,7 +618,7 @@ public class HostParser {
         throw new ValidationException(ValidationError.HOST_INVALID_CODEPOINT);
       }
       // 2
-      if (!CodepointHelper.isUrlCodepoint(codePoint) && codePoint != CodepointHelper.CP_PERCENT) {
+      if (CodepointHelper.isNotUrlCodepoint(codePoint) && codePoint != CodepointHelper.CP_PERCENT) {
         errorHandler.accept(ValidationError.INVALID_URL_UNIT);
       }
       // 3

@@ -608,7 +608,7 @@ public class UrlImpl implements Url {
     return validationErrors != null ? validationErrors : Collections.emptyList();
   }
 
-  public void validationError(ValidationError error) {
+  void validationError(ValidationError error) {
     Objects.requireNonNull(error);
     if (validationErrors == null) {
       validationErrors = new ArrayList<>();

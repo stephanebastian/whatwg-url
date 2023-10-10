@@ -36,7 +36,6 @@ class UrlParser {
   }
 
   /**
-   * <pre>
    * <ul>
    *   <li>1) If c is U+0040 (@), then:</li>
    *   <li>
@@ -72,13 +71,12 @@ class UrlParser {
    *  </li>
    *   <li>3) Otherwise, append c to buffer.
    * </ul>
-   * </pre>
    */
   private StateReturnType authorityState() {
     // 1
     if (input.codepointIs(CodepointHelper.CP_AT)) {
       // 1.1
-      url.validationError(ValidationError.INVALID_CREDENTIALS);
+      validationError(ValidationError.INVALID_CREDENTIALS);
       // 1.2
       if (atSignSeenFlag) {
         prependToBuffer("%40");
@@ -113,7 +111,7 @@ class UrlParser {
         || (url.isSpecial() && input.codepointIs(CodepointHelper.CP_BACKSLASH))) {
       // 2.1
       if (atSignSeenFlag && buffer().length() == 0) {
-        throw new ValidationException(ValidationError.HOST_MISSING);
+        throw validationException(ValidationError.HOST_MISSING);
       } else {
         // 2.2
         input.decreasePointerBy((int) buffer().codePoints().count() + 1);
@@ -128,7 +126,6 @@ class UrlParser {
   }
 
   /**
-   * <pre>
    *   The basic URL parser takes a scalar value string input, with an optional null
    *   or base URL base (default null), an optional encoding encoding (default UTF-8),
    *   an optional URL url, and an optional state override state override,
@@ -160,7 +157,6 @@ class UrlParser {
    *     Otherwise, increase pointer by 1 and continue with the state machine.
    *     </li>
    *   </ul>
-   * </pre>
    */
   public UrlImpl basicParse(String input, UrlImpl base, Charset encoding, UrlImpl url,
       State stateOverride) {
@@ -176,18 +172,19 @@ class UrlParser {
     // 1
     if (url == null) {
       // 1.1
-      url = new UrlImpl();
+      this.url = new UrlImpl();
       // 1.2
       if (UrlHelper.hasLeadingOrTrailingC0ControlOrSpace(codepoints)) {
-        url.validationError(ValidationError.INVALID_URL_UNIT);
+        validationError(ValidationError.INVALID_URL_UNIT);
         // 1.3
         codepoints = UrlHelper.removeLeadingOrTrailingC0ControlOrSpace(codepoints);
       }
+    } else {
+      this.url = url;
     }
-    this.url = url;
     // 2
     if (UrlHelper.hasAsciiTabOrNewline(codepoints)) {
-      url.validationError(ValidationError.INVALID_URL_UNIT);
+      validationError(ValidationError.INVALID_URL_UNIT);
       // 3
       codepoints = UrlHelper.removeAsciiTabAndNewline(codepoints);
     }
@@ -239,7 +236,6 @@ class UrlParser {
   }
 
   /**
-   * <pre>
    * <ul>
    *   <li>1) If c is the EOF code point, U+002F (/), U+005C (\), U+003F (?),
    *   or U+0023 (#), then decrease pointer by 1 and then:
@@ -270,7 +266,6 @@ class UrlParser {
    *   </li>
    *   <li>Otherwise, append c to buffer.</li>
    * </ul>
-   * </pre>
    */
   private StateReturnType fileHostState() {
     // 1
@@ -279,7 +274,7 @@ class UrlParser {
       input.decreasePointerByOne();
       // 1.1
       if (stateOverride == null && UrlHelper.isWindowsDriveLetter(buffer().toString(), 0)) {
-        url.validationError(ValidationError.FILE_INVALID_WINDOWS_DRIVE_LETTER_HOST);
+        validationError(ValidationError.FILE_INVALID_WINDOWS_DRIVE_LETTER_HOST);
         state(State.PATH);
       }
       // 1.2
@@ -295,15 +290,20 @@ class UrlParser {
       }
       // 1.3
       else {
-        // 1.3.1
-        // 1.3.2
-        Host host = HostParser.parse(buffer().toString(), !url.isSpecial(), url::validationError);
-        // 1.3.3
-        if (host instanceof Domain && "localhost".equals(((Domain) host).host())) {
-          host = EmptyHost.create();
+        try {
+          // 1.3.1
+          Host host =
+              HostParser.parse(buffer().toString(), !url.isSpecial(), this::validationError);
+          // 1.3.3
+          if (host instanceof Domain && "localhost".equals(((Domain) host).host())) {
+            host = EmptyHost.create();
+          }
+          // 1.3.4
+          url.host = host;
+        } catch (ValidationException e) {
+          // 1.3.2
+          throw validationException(e.validationError());
         }
-        // 1.3.4
-        url.host = host;
         // 1.3.5
         if (stateOverride != null) {
           return StateReturnType.RETURN;
@@ -321,7 +321,6 @@ class UrlParser {
   }
 
   /**
-   * <pre>
    * <ul>
    *   <li>1) if c is U+002F (/) or U+005C (\), then:
    *     <ul>
@@ -345,14 +344,13 @@ class UrlParser {
    *     </ul>
    *   </li>
    * </ul>
-   * </pre>
    */
   private StateReturnType fileSlashState() {
     // 1
     if (input.codepointIsOneOf(CodepointHelper.CP_SLASH, CodepointHelper.CP_BACKSLASH)) {
       // 1.1
       if (input.codepointIs(CodepointHelper.CP_BACKSLASH)) {
-        url.validationError(ValidationError.INVALID_REVERSE_SOLIDUS);
+        validationError(ValidationError.INVALID_REVERSE_SOLIDUS);
       }
       // 1.2
       state(State.FILE_HOST);
@@ -377,7 +375,6 @@ class UrlParser {
   }
 
   /**
-   * <pre>
    * <ul>
    *   <li>1) Set url’s scheme to "file".</li>
    *   <li>2) Set url’s host to the empty string.</li>
@@ -415,7 +412,6 @@ class UrlParser {
    *   </li>
    *   <li>5) Otherwise, set state to path state, and decrease pointer by 1.</li>
    * </ul>
-   * </pre>
    */
   private StateReturnType fileState() {
     // 1
@@ -426,7 +422,7 @@ class UrlParser {
     if (input.codepointIsOneOf(CodepointHelper.CP_SLASH, CodepointHelper.CP_BACKSLASH)) {
       // 3.1
       if (input.codepointIs(CodepointHelper.CP_BACKSLASH)) {
-        url.validationError(ValidationError.INVALID_REVERSE_SOLIDUS);
+        validationError(ValidationError.INVALID_REVERSE_SOLIDUS);
       }
       // 3.2
       state(State.FILE_SLASH);
@@ -458,7 +454,7 @@ class UrlParser {
         // 4.4.3
         else {
           // 4.4.3.1
-          url.validationError(ValidationError.FILE_INVALID_WINDOWS_DRIVE_LETTER);
+          validationError(ValidationError.FILE_INVALID_WINDOWS_DRIVE_LETTER);
           // 4.4.3.2
           url.path.clear();
         }
@@ -476,7 +472,6 @@ class UrlParser {
   }
 
   /**
-   * <pre>
    * <ul>
    *   <li>1) If c is not the EOF code point, then:
    *     <ul>
@@ -490,20 +485,19 @@ class UrlParser {
    *   </li>
    *   <li></li>
    * </ul>
-   * </pre>
    */
   private StateReturnType fragmentState() {
     // 1
     if (input.codepointIsNot(CodepointHelper.CP_EOF)) {
       // 1.1
-      if (!CodepointHelper.isUrlCodepoint(input.codepoint())
+      if (CodepointHelper.isNotUrlCodepoint(input.codepoint())
           && input.codepoint() != CodepointHelper.CP_PERCENT) {
-        url.validationError(ValidationError.INVALID_URL_UNIT);
+        validationError(ValidationError.INVALID_URL_UNIT);
       }
       // 1.2
       if (input.codepointIs(CodepointHelper.CP_PERCENT)
           && input.remainingMatch(2, (idx, cp) -> InfraHelper.isAsciiHexDigit(cp))) {
-        url.validationError(ValidationError.INVALID_URL_UNIT);
+        validationError(ValidationError.INVALID_URL_UNIT);
       }
       // 1.3
       String utf8PercentEncode = UrlHelper.utf8PercentEncode(utf8Encoder(), input.codepoint(),
@@ -514,7 +508,6 @@ class UrlParser {
   }
 
   /**
-   * <pre>
    *   <ul>
    *      <li>1) If state override is given and url’s scheme is "file", then decrease pointer by 1 and set state to file host state.</li>
    *      <li>2) Otherwise, if c is U+003A (:) and insideBrackets is false, then:
@@ -550,7 +543,6 @@ class UrlParser {
    *        </ul>
    *      </li>
    *   </ul>
-   * </pre>
    */
   private StateReturnType hostState() {
     // 1
@@ -562,14 +554,19 @@ class UrlParser {
     else if (input.codepointIs(CodepointHelper.CP_COLON) && !insideBracketsFlag) {
       // 2.1
       if (buffer().length() == 0) {
-        throw new ValidationException(ValidationError.HOST_MISSING);
+        throw validationException(ValidationError.HOST_MISSING);
       }
       // 2.2
       if (State.HOSTNAME.equals(stateOverride)) {
         return StateReturnType.RETURN;
       }
-      // 2.3, 2.4, 2.5
-      url.host = HostParser.parse(buffer().toString(), !url.isSpecial(), url::validationError);
+      try {
+        // 2.3, 2.5
+        url.host = HostParser.parse(buffer().toString(), !url.isSpecial(), this::validationError);
+      } catch (ValidationException e) {
+        // 2.4
+        throw validationException(e.validationError());
+      }
       clearBuffer();
       state(State.PORT);
     }
@@ -580,15 +577,20 @@ class UrlParser {
       input.decreasePointerByOne();
       // 3.1
       if (url.isSpecial() && buffer().length() == 0) {
-        throw new ValidationException(ValidationError.HOST_MISSING);
+        throw validationException(ValidationError.HOST_MISSING);
       }
       // 3.2
       else if (stateOverride != null && buffer().length() == 0
           && (url.includeCredentials() || url.port != null)) {
         return StateReturnType.RETURN;
       }
-      // 3.3, 3.4, 3.5
-      url.host = HostParser.parse(buffer().toString(), !url.isSpecial(), url::validationError);
+      try {
+        // 3.3, 3.5
+        url.host = HostParser.parse(buffer().toString(), !url.isSpecial(), this::validationError);
+      } catch (ValidationException e) {
+        // 3.4
+        throw validationException(e.validationError());
+      }
       clearBuffer();
       state(State.PATH_START);
       // 3.6
@@ -636,7 +638,6 @@ class UrlParser {
   }
 
   /**
-   * <pre>
    * <ul>
    *   <li>1) If base is null, or base has an opaque path and c is not U+0023 (#),
    *   missing-scheme-non-relative-URL validation error, return failure.</li>
@@ -647,12 +648,11 @@ class UrlParser {
    *   and decrease pointer by 1.</li>
    *   <li>4) Otherwise, set state to file state and decrease pointer by 1.</li>
    * </ul>
-   * </pre>
    */
   private StateReturnType noSchemeState() {
     // 1
     if (base == null || (base.hasAnOpaquePath() && input.codepointIsNot(CodepointHelper.CP_HASH))) {
-      throw new ValidationException(ValidationError.MISSING_SCHEME_NON_RELATIVE_URL);
+      throw validationException(ValidationError.MISSING_SCHEME_NON_RELATIVE_URL);
     }
     // 2
     else if (base.hasAnOpaquePath() && input.codepointIs(CodepointHelper.CP_HASH)) {
@@ -676,7 +676,6 @@ class UrlParser {
   }
 
   /**
-   * <pre>
    * <ul>
    *   <li>1) If c is U+003F (?), then set url’s query to the empty string and state to query state.
    *   <li>2) Otherwise, if c is U+0023 (#), then set url’s fragment to the empty string and state to
@@ -692,7 +691,6 @@ class UrlParser {
    *     </ul>
    *   </li>
    * </ul>
-   * </pre>
    *
    * @return
    */
@@ -710,14 +708,14 @@ class UrlParser {
     // 3
     else {
       // 3.1
-      if (!input.isEof() && CodepointHelper.isUrlCodepoint(input.codepoint())
+      if (!input.isEof() && CodepointHelper.isNotUrlCodepoint(input.codepoint())
           && input.codepointIsNot(CodepointHelper.CP_PERCENT)) {
-        url.validationError(ValidationError.INVALID_URL_UNIT);
+        validationError(ValidationError.INVALID_URL_UNIT);
       }
       // 3.2
       if (input.codepointIs(CodepointHelper.CP_PERCENT)
           && input.remainingMatch(2, (pos, cp) -> InfraHelper.isAsciiHexDigit(cp))) {
-        url.validationError(ValidationError.INVALID_URL_UNIT);
+        validationError(ValidationError.INVALID_URL_UNIT);
       }
       // 3.3
       if (!input.isEof()) {
@@ -734,12 +732,10 @@ class UrlParser {
   }
 
   /**
-   * <pre>
    *   <ul>
    *     <li>1) If c is U+002F (/), then set state to authority state.</li>
    *     <li>2) Otherwise, set state to path state, and decrease pointer by 1.</li>
    *   </ul>
-   * </pre>
    */
   private StateReturnType pathOrAuthorityState() {
     if (input.codepointIs(CodepointHelper.CP_SLASH)) {
@@ -752,7 +748,6 @@ class UrlParser {
   }
 
   /**
-   * <pre>
    * <ul>
    *   <li>1) If url is special, then:
    *     <ul>
@@ -773,14 +768,13 @@ class UrlParser {
    *   </li>
    *   <li>Otherwise, if state override is given and url’s host is null, append the empty string to url’s path.</li>
    * </ul>
-   * </pre>
    */
   private StateReturnType pathStartState() {
     // 1
     if (url.isSpecial()) {
       // 1.1
       if (input.codepointIs(CodepointHelper.CP_BACKSLASH)) {
-        url.validationError(ValidationError.INVALID_REVERSE_SOLIDUS);
+        validationError(ValidationError.INVALID_REVERSE_SOLIDUS);
       }
       // 1.2
       state(State.PATH);
@@ -814,7 +808,6 @@ class UrlParser {
   }
 
   /**
-   * <pre>
    * <ul>
    *   <li>1) If one of the following is true:
    *     <br>c is the EOF code point or U+002F (/)
@@ -867,7 +860,6 @@ class UrlParser {
    *     </ul>
    *   </li>
    * </ul>
-   * </pre>
    */
   private StateReturnType pathState() {
     // 1
@@ -877,7 +869,7 @@ class UrlParser {
             CodepointHelper.CP_HASH)))) {
       // 1.1
       if (url.isSpecial() && input.codepoint() == CodepointHelper.CP_BACKSLASH /* \ */) {
-        url.validationError(ValidationError.INVALID_REVERSE_SOLIDUS);
+        validationError(ValidationError.INVALID_REVERSE_SOLIDUS);
       }
       // 1.2
       if (UrlHelper.isDoubleDotPathSegment(buffer())) {
@@ -923,14 +915,14 @@ class UrlParser {
     // 2
     else {
       // 2.1
-      if (!CodepointHelper.isUrlCodepoint(input.codepoint())
+      if (CodepointHelper.isNotUrlCodepoint(input.codepoint())
           && input.codepointIsNot(CodepointHelper.CP_PERCENT)) {
-        url.validationError(ValidationError.INVALID_URL_UNIT);
+        validationError(ValidationError.INVALID_URL_UNIT);
       }
       // 2.2
       if (input.codepointIs(CodepointHelper.CP_PERCENT)
           && !input.remainingMatch(2, (idx, cp) -> InfraHelper.isAsciiHexDigit(cp))) {
-        url.validationError(ValidationError.INVALID_URL_UNIT);
+        validationError(ValidationError.INVALID_URL_UNIT);
       }
       // 2.3
       buffer.append(UrlHelper.utf8PercentEncode(utf8Encoder(), input.codepoint(),
@@ -940,7 +932,6 @@ class UrlParser {
   }
 
   /**
-   * <pre>
    *   <ul>
    *     <li>1) If c is an ASCII digit, append c to buffer.</li>
    *     <li>2) Otherwise, if one of the following is true:
@@ -963,7 +954,6 @@ class UrlParser {
    *     </li>
    *     <li>3) Otherwise, port-invalid validation error, return failure.</li>
    *   </ul>
-   * </pre>
    */
   private StateReturnType portState() {
     // 1
@@ -981,7 +971,7 @@ class UrlParser {
         Integer port = Integer.valueOf(buffer().toString(), 10);
         // 2.1.2
         if (port > 65535) {
-          throw new ValidationException(ValidationError.PORT_OUT_OF_RANGE);
+          throw validationException(ValidationError.PORT_OUT_OF_RANGE);
         }
         // 2.1.3
         Integer defaultPort = UrlHelper.getDefaultSchemePort(url.scheme);
@@ -1003,7 +993,7 @@ class UrlParser {
     }
     // 3
     else {
-      throw new ValidationException(ValidationError.PORT_INVALID);
+      throw validationException(ValidationError.PORT_INVALID);
     }
     return StateReturnType.CONTINUE;
   }
@@ -1018,7 +1008,6 @@ class UrlParser {
   }
 
   /**
-   * <pre>
    * <ul>
    *   <li>1) If encoding is not UTF-8 and one of the following is true:
    *     <br>url is not special
@@ -1052,7 +1041,6 @@ class UrlParser {
    *     </ul>
    *   </li>
    * </ul>
-   * </pre>
    */
   private StateReturnType queryState() {
     // 1
@@ -1081,13 +1069,14 @@ class UrlParser {
     // 3
     else if (input.codepointIsNot(CodepointHelper.CP_EOF)) {
       // 3.1
-      if (!CodepointHelper.isUrlCodepoint(input.codepoint())) {
-        url.validationError(ValidationError.INVALID_URL_UNIT);
+      if (CodepointHelper.isNotUrlCodepoint(input.codepoint())
+          && input.codepointIsNot(CodepointHelper.CP_PERCENT)) {
+        validationError(ValidationError.INVALID_URL_UNIT);
       }
       // 3.2
       if (input.codepointIs(CodepointHelper.CP_PERCENT)
           && !input.remainingMatch(2, (idx, cp) -> InfraHelper.isAsciiHexDigit(cp))) {
-        url.validationError(ValidationError.INVALID_URL_UNIT);
+        validationError(ValidationError.INVALID_URL_UNIT);
       }
       // 3.3
       appendToBuffer(input.codepoint());
@@ -1096,7 +1085,6 @@ class UrlParser {
   }
 
   /**
-   * <pre>
    *   <ul>
    *     <li>1) If url is special and c is U+002F (/) or U+005C (\), then:
    *       <ul>
@@ -1107,7 +1095,6 @@ class UrlParser {
    *     <li>2) Otherwise, if c is U+002F (/), then set state to authority state.</li>
    *     <li>3) Otherwise, set url’s username to base’s username, url’s password to base’s password, url’s host to base’s host, url’s port to base’s port, state to path state, and then, decrease pointer by 1.</li>
    *   </ul>
-   * </pre>
    */
   private StateReturnType relativeSlashState() {
     // 1
@@ -1115,7 +1102,7 @@ class UrlParser {
         && (input.codepointIsOneOf(CodepointHelper.CP_SLASH, CodepointHelper.CP_BACKSLASH))) {
       // 1.1
       if (input.codepointIs(CodepointHelper.CP_BACKSLASH)) {
-        url.validationError(ValidationError.INVALID_REVERSE_SOLIDUS);
+        validationError(ValidationError.INVALID_REVERSE_SOLIDUS);
       }
       // 1.2
       state(State.SPECIAL_AUTHORITY_IGNORE_SLASHES);
@@ -1134,7 +1121,6 @@ class UrlParser {
   }
 
   /**
-   * <pre>
    *   <ul>
    *     <li>1) Assert: base’s scheme is not "file".</li>
    *     <li>2) Set url’s scheme to base’s scheme.</li>
@@ -1156,7 +1142,6 @@ class UrlParser {
    *      </ul>
    *     </li>
    *   </ul>
-   * </pre>
    */
   private StateReturnType relativeState() {
     // TODO properly implement rule 1, throwing an exception
@@ -1168,7 +1153,7 @@ class UrlParser {
     }
     // 4
     else if (url.isSpecial() && input.codepointIs(CodepointHelper.CP_BACKSLASH)) {
-      url.validationError(ValidationError.INVALID_REVERSE_SOLIDUS);
+      validationError(ValidationError.INVALID_REVERSE_SOLIDUS);
       state(State.RELATIVE_SLASH);
     }
     // 5
@@ -1198,7 +1183,6 @@ class UrlParser {
   }
 
   /***
-   * <pre>
    * <ul>
    *   <li>1) if c is an ASCII alpha, append c, lowercased, to buffer,
    *   and set state to scheme state.
@@ -1207,7 +1191,6 @@ class UrlParser {
    *   <li>3) Otherwise, return failure.
    * </ul>
    * <br>This indication of failure is used exclusively by the Location object’s protocol setter.
-   * </pre>
    **/
   private StateReturnType schemeStartState() {
     // 1
@@ -1223,11 +1206,10 @@ class UrlParser {
       return StateReturnType.CONTINUE;
     }
     // 3
-    throw new ValidationException(ValidationError._INVALID_SCHEME);
+    throw validationException(ValidationError._INVALID_SCHEME);
   }
 
   /**
-   * <pre>
    * <ul>
    *   <li>1) If c is an ASCII alphanumeric, U+002B (+), U+002D (-), or U+002E (.),
    *   append c, lowercased, to buffer.
@@ -1283,7 +1265,6 @@ class UrlParser {
    * <br>This indication of failure is used exclusively by the Location object’s protocol setter.
    * <br>Furthermore, the non-failure termination earlier in this state is an intentional difference for
    * <br>defining that setter.
-   * </pre>
    */
   private StateReturnType schemeState() {
     // 1
@@ -1328,7 +1309,7 @@ class UrlParser {
       // 2.5
       if ("file".equals(url.scheme)) {
         if (!input.remainingMatch(2, (idx, cp) -> cp == CodepointHelper.CP_SLASH)) {
-          url.validationError(ValidationError.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
+          validationError(ValidationError.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
         }
         state(State.FILE);
       }
@@ -1360,16 +1341,14 @@ class UrlParser {
       return StateReturnType.CONTINUE;
     }
     // 4
-    throw new ValidationException(ValidationError._INVALID_SCHEME);
+    throw validationException(ValidationError._INVALID_SCHEME);
   }
 
   /**
-   * <pre>
    *   <ul>
    *     <li>1) If c is neither U+002F (/) nor U+005C (\), then set state to authority state and decrease pointer by 1.</li>
    *     <li>2) Otherwise, special-scheme-missing-following-solidus validation error.</li>
    *   </ul>
-   * </pre>
    */
   private StateReturnType specialAuthorityIgnoreSlashState() {
     // 1
@@ -1377,18 +1356,16 @@ class UrlParser {
       state(State.AUTHORITY);
       input.decreasePointerByOne();
     } else {
-      url.validationError(ValidationError.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
+      validationError(ValidationError.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
     }
     return StateReturnType.CONTINUE;
   }
 
   /**
-   * <pre>
    *   <ul>
    *     <li>1) If c is U+002F (/) and remaining starts with U+002F (/), then set state to special authority ignore slashes state and increase pointer by 1.</li>
    *     <li>2) Otherwise, special-scheme-missing-following-solidus validation error, set state to special authority ignore slashes state and decrease pointer by 1.</li>
    *   </ul>
-   * </pre>
    */
   private StateReturnType specialAuthoritySlashesState() {
     // 1
@@ -1399,7 +1376,7 @@ class UrlParser {
     }
     // 2
     else {
-      url.validationError(ValidationError.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
+      validationError(ValidationError.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
       state(State.SPECIAL_AUTHORITY_IGNORE_SLASHES);
       input.decreasePointerByOne();
     }
@@ -1407,7 +1384,6 @@ class UrlParser {
   }
 
   /**
-   * <pre>
    *   <ul>
    *     <li>1) c is U+002F (/) and remaining starts with U+002F (/),
    *     then set state to special authority ignore slashes state
@@ -1415,7 +1391,6 @@ class UrlParser {
    *     <li>2) Otherwise, special-scheme-missing-following-solidus validation error,
    *     set state to relative state and decrease pointer by 1.</li>
    *   </ul>
-   * </pre>
    */
   private StateReturnType specialRelativeOrAuthorityState() {
     if (input.codepointIs(CodepointHelper.CP_SLASH)
@@ -1423,7 +1398,7 @@ class UrlParser {
       state(State.SPECIAL_AUTHORITY_IGNORE_SLASHES);
       input.increasePointerByOne();
     } else {
-      url.validationError(ValidationError.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
+      validationError(ValidationError.SPECIAL_SCHEME_MISSING_FOLLOWING_SOLIDUS);
       state(State.RELATIVE);
       input.decreasePointerByOne();
     }
@@ -1524,6 +1499,15 @@ class UrlParser {
       utf8Encoder = StandardCharsets.UTF_8.newEncoder();
     }
     return utf8Encoder;
+  }
+
+  void validationError(ValidationError error) {
+    url.validationError(error);
+  }
+
+  ValidationException validationException(ValidationError error) {
+    validationError(error);
+    return new ValidationException(error);
   }
 
   private enum StateReturnType {

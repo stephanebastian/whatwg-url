@@ -6,8 +6,8 @@ public class ValidationException extends RuntimeException {
   private final ValidationError validationError;
 
   public ValidationException(ValidationError validationError) {
-    super();
-    this.validationError = Objects.requireNonNull(validationError);
+    super(Objects.requireNonNull(validationError).description());
+    this.validationError = validationError;
   }
 
   public ValidationError validationError() {

@@ -75,11 +75,11 @@ public enum ValidationError {
  "An uncompressed IPv6 address contains fewer than 8 pieces.\n"
        + "\n"+ "\"https://[1:2:3]\" ",
  true),
-  IPV4_IPV6_TOO_MANY_PIECES(
+  IPV4_IN_IPV6_TOO_MANY_PIECES(
  "An IPv6 address with IPv4 address syntax: the IPv6 address has more than 6 pieces.\n"
        + "\n"+ "\"https://[1:1:1:1:1:1:1:127.0.0.1]\"",
  true),
-  IPV4_IPV6_INVALID_CODEPOINT(
+  IPV4_IN_IPV6_INVALID_CODEPOINT(
  "An IPv6 address with IPv4 address syntax:\n"
        + "\n"
        + "An IPv4 part is empty or contains a non-ASCII digit.\n"
@@ -96,7 +96,7 @@ public enum ValidationError {
        + "\n"
        + "\"https://[ffff::127.0.0.1.2]\"\n",
 true),
-  IPV4_IPV6_OUT_OF_RANGE_PART(
+  IPV4_IN_IPV6_OUT_OF_RANGE_PART(
  "An IPv6 address with IPv4 address syntax: an IPv4 part exceeds 255.\n"
        + "\n"
        + "\"https://[ffff::127.0.0.4000]\" ",
@@ -147,7 +147,7 @@ true),
        + "\n"
        + "\"https://user@example.org\"\n"
        + "\n"
-       + "\"https://user:pass@\"\n",
+       + "\"ssh://user@example.org\"\n",
  false),
   HOST_MISSING(
  "The input has a special scheme, but does not contain a host.\n"
@@ -169,7 +169,7 @@ true),
   FILE_INVALID_WINDOWS_DRIVE_LETTER(
  "The input is a relative-URL string that starts with a Windows drive letter and the base URL’s scheme is \"file\".\n"
        + "\n"
-       + "const url = new URL(\"/c:/path/to/file\", \"file:///c:/\"),",
+       + "const url = new URL(\"c:/path/to/file\", \"file:///c:/\"),",
  false),
   FILE_INVALID_WINDOWS_DRIVE_LETTER_HOST(
  "A file: URL’s host is a Windows drive letter.\n"
@@ -191,7 +191,7 @@ true),
   private final String description;
   private final boolean isFailure;
 
-  private ValidationError(String description, boolean isFailure) {
+  ValidationError(String description, boolean isFailure) {
     this.description = Objects.requireNonNull(description);
     this.isFailure = isFailure;
   }
