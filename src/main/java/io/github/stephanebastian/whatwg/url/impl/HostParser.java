@@ -618,7 +618,7 @@ public class HostParser {
         throw new ValidationException(ValidationError.HOST_INVALID_CODEPOINT);
       }
       // 2
-      if (CodepointHelper.isNotUrlCodepoint(codePoint) && codePoint != CodepointHelper.CP_PERCENT) {
+      if (!CodepointHelper.isUrlCodepoint(codePoint) && codePoint != CodepointHelper.CP_PERCENT) {
         errorHandler.accept(ValidationError.INVALID_URL_UNIT);
       }
       // 3

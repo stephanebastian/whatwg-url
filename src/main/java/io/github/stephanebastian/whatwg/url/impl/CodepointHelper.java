@@ -203,13 +203,13 @@ public class CodepointHelper {
    * @param codepoint the codepoint to test
    * @return true if the codepoint is a Url codepoint, false otherwise
    */
-  public static boolean isNotUrlCodepoint(int codepoint) {
-    return !InfraHelper.isAsciiAlphanumeric(codepoint) && codepoint != 0x0021 && codepoint != 0x0024
-        && codepoint != 0x0026 && codepoint != 0x0027 && codepoint != 0x0028 && codepoint != 0x0029
-        && codepoint != 0x002A && codepoint != 0x002B && codepoint != 0x002C && codepoint != 0x002D
-        && codepoint != 0x002E && codepoint != 0x002F && codepoint != 0x003A && codepoint != 0x003B
-        && codepoint != 0x003D && codepoint != 0x003F && codepoint != 0x0040 && codepoint != 0x005F
-        && codepoint != 0x007E && (codepoint < 0x00A0 || codepoint > 0x10FFFD)
-        && !InfraHelper.isSurrogate(codepoint) && !isNonCharacter(codepoint);
+  public static boolean isUrlCodepoint(int codepoint) {
+    return InfraHelper.isAsciiAlphanumeric(codepoint) || codepoint == 0x0021 || codepoint == 0x0024
+        || codepoint == 0x0026 || codepoint == 0x0027 || codepoint == 0x0028 || codepoint == 0x0029
+        || codepoint == 0x002A || codepoint == 0x002B || codepoint == 0x002C || codepoint == 0x002D
+        || codepoint == 0x002E || codepoint == 0x002F || codepoint == 0x003A || codepoint == 0x003B
+        || codepoint == 0x003D || codepoint == 0x003F || codepoint == 0x0040 || codepoint == 0x005F
+        || codepoint == 0x007E || (codepoint > 0x00A0 && codepoint < 0x10FFFD
+            && !InfraHelper.isSurrogate(codepoint) && !isNonCharacter(codepoint));
   }
 }

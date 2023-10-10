@@ -2,6 +2,7 @@ package io.github.stephanebastian.whatwg.url.impl;
 
 import java.util.Objects;
 import java.util.function.BiPredicate;
+import java.util.function.IntPredicate;
 
 /**
  * This class is a helper to make it easier to deal with codepoints
@@ -37,6 +38,14 @@ public class Codepoints {
 
   boolean codepointIs(int codePoint) {
     return codepoint() == codePoint;
+  }
+
+  boolean codepointIs(IntPredicate predicate) {
+    return predicate.test(codepoint());
+  }
+
+  boolean codepointIsNot(IntPredicate predicate) {
+    return !codepointIs(predicate);
   }
 
   boolean codepointIsNot(int codePoint) {

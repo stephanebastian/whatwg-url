@@ -490,8 +490,8 @@ class UrlParser {
     // 1
     if (input.codepointIsNot(CodepointHelper.CP_EOF)) {
       // 1.1
-      if (CodepointHelper.isNotUrlCodepoint(input.codepoint())
-          && input.codepoint() != CodepointHelper.CP_PERCENT) {
+      if (input.codepointIsNot(CodepointHelper::isUrlCodepoint)
+          && input.codepointIsNot(CodepointHelper.CP_PERCENT)) {
         validationError(ValidationError.INVALID_URL_UNIT);
       }
       // 1.2
@@ -708,7 +708,7 @@ class UrlParser {
     // 3
     else {
       // 3.1
-      if (!input.isEof() && CodepointHelper.isNotUrlCodepoint(input.codepoint())
+      if (!input.isEof() && input.codepointIsNot(CodepointHelper::isUrlCodepoint)
           && input.codepointIsNot(CodepointHelper.CP_PERCENT)) {
         validationError(ValidationError.INVALID_URL_UNIT);
       }
@@ -868,7 +868,7 @@ class UrlParser {
         || (stateOverride == null && (input.codepointIsOneOf(CodepointHelper.CP_QUESTION_MARK,
             CodepointHelper.CP_HASH)))) {
       // 1.1
-      if (url.isSpecial() && input.codepoint() == CodepointHelper.CP_BACKSLASH /* \ */) {
+      if (url.isSpecial() && input.codepointIs(CodepointHelper.CP_BACKSLASH) /* \ */) {
         validationError(ValidationError.INVALID_REVERSE_SOLIDUS);
       }
       // 1.2
@@ -915,7 +915,7 @@ class UrlParser {
     // 2
     else {
       // 2.1
-      if (CodepointHelper.isNotUrlCodepoint(input.codepoint())
+      if (input.codepointIsNot(CodepointHelper::isUrlCodepoint)
           && input.codepointIsNot(CodepointHelper.CP_PERCENT)) {
         validationError(ValidationError.INVALID_URL_UNIT);
       }
@@ -1069,7 +1069,7 @@ class UrlParser {
     // 3
     else if (input.codepointIsNot(CodepointHelper.CP_EOF)) {
       // 3.1
-      if (CodepointHelper.isNotUrlCodepoint(input.codepoint())
+      if (input.codepointIsNot(CodepointHelper::isUrlCodepoint)
           && input.codepointIsNot(CodepointHelper.CP_PERCENT)) {
         validationError(ValidationError.INVALID_URL_UNIT);
       }
