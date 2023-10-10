@@ -1,19 +1,80 @@
 # Java implementation of WhatWg URL Living Standard
 
-This project is a java implementation of the [WhatWg specification - 27 September 2023](https://url.spec.whatwg.org/).
-The main advantage of the WhatWg Url standard is that it fixes the various shortcomings and quirks of java.net.URL, RFC3986 and RFC3987, etc. 
+This project is a java implementation of the [WhatWg specification](https://url.spec.whatwg.org/) - The main advantage of the WhatWg Url standard is that it fixes the various shortcomings and quirks of java.net.URL, RFC3986 and RFC3987, etc.
 
-The library is pretty slim (~50k), works with Java 8 and up, and only has a dependency on [ICU](https://unicode-org.github.io/icu/userguide/icu4j/)
-For the more adventurous, the core implementation lives in the class UrlParser and is based on a state machine. 
+It is in sync with [this specific commit (27 September 2023)](https://github.com/whatwg/url/commit/aa64bb27d427cef0d87f134980ac762cced1f5bb).
 
-For the record, I started this project years ago and used it in several projects. Always wanted to open-source it but never got the time to do it properly. This is long overdue and I hope you'll find it useful.
-Note that I refactored the code recently and updated it to the latest WhatWg Url specification
+The library is pretty slim (~50k), works with Java 8 and up, and only has a dependency on [ICU](https://unicode-org.github.io/icu/userguide/icu4j/).
+Tests coverage is pretty good (3000+ tests). Some test data are borrowed from [Web-Platform](https://github.com/web-platform-tests/wpt/tree/master/url/resources/), the cross-browser test suite (Safari, Chrome, Firefox, Edge...)). 
+As a side note, there is a basic benchmark (built with jmh) that iterates over 500+ 'typical' urls and measures the throughput (350000 ops/s on an AMD Ryzen 5, but your mileage may vary)
+For the more adventurous/curious, the interesting bits live in the class UrlParser and is based on a state machine.
 
-The Java API closely follows [WhatWg API](https://url.spec.whatwg.org/#api). It provide an extra method Url.validationErrors() to list potential validations that may have been reported when parsing the raw url or when setting properties
+For the record, I started this project years ago and used it in several projects. I always wanted to open-source it, but never got the time to do it properly. This is long overdue, and I hope you'll find it useful.
 
-Tests coverage is pretty good (3000+ tests). Some test data are borrowed from [Web-Platform](https://github.com/web-platform-tests/wpt/tree/master/url/resources/), the cross-browser test suite (Safari, Chrome, Firefox, Edge...))
+You are obviously more than welcome to provide feedback, report issue and... provide pull requests ! :)
 
-You are obviously more than welcome to provide feedback, report issue and... provide pull requests ! :) 
+# Java API
+
+The Java API closely follows [WhatWg API](https://url.spec.whatwg.org/#api). 
+Note that both create methods may throw a ValidationException. However, calling a setter with a bad value does *not* thrown an exception but report them in the method validationErrors()
+
+```
+public interface Url {
+  static boolean canParse(String url);
+  static boolean canParse(String url, String baseUrl);
+  static Url create();
+  static Url create(String input);
+  static Url create(String input, String baseUrl);
+  
+  String hash();
+  Url hash(String value);
+  String host();
+  Url host(String value);
+  String hostname();
+  Url hostname(String value);
+  String href();
+  Url href(String value);
+  String origin();
+  String password();
+  Url password(String value);
+  String pathname();
+  Url pathname(String value);
+  String port();
+  Url port(String value);
+  String protocol();
+  Url protocol(String value);
+  String search();
+  Url search(String value);
+  UrlSearchParams searchParams();
+  String toJSON();
+  String username();
+  Url username(String value);
+  // not in the spec, but very useful to list validation errors when parsing the initial raw url or when setting properties.
+  Collection<ValidationError> validationErrors();
+}
+
+public interface UrlSearchParams {
+  UrlSearchParams append(String name, String value);
+  Collection<String> delete(String name);
+  boolean delete(String name, String value);
+  UrlSearchParams entries(BiConsumer<String, String> consumer);
+  String get(String name);
+  Collection<String> getAll(String name);
+  boolean has(String name);
+  boolean has(String name, String value);
+  UrlSearchParams set(String name, String value);
+  int size();
+  UrlSearchParams sort();
+}
+
+public enum ValidationError {
+  ... various enum values
+
+  public String description();
+  public boolean isFailure();
+}
+
+```
 
 # Usage
 Typical code to parse a url
@@ -24,20 +85,18 @@ import org.assertj.core.api.Assertions;
 
 public void parseUrl() {
     Url url = Url.create("http://www.myurl.com/path1?a=1&b=2#hash1");
-    Assertions.assertThat(url).isNotNull();
-    Assertions.assertThat(url.hash()).isEqualTo("#hash1");
-    Assertions.assertThat(url.host()).isEqualTo("www.myurl.com");
-    Assertions.assertThat(url.hostname()).isEqualTo("www.myurl.com");
-    Assertions.assertThat(url.href()).isEqualTo("http://www.myurl.com/path1?a=1&b=2#hash1");
-    Assertions.assertThat(url.origin()).isEqualTo("http://www.myurl.com");
-    Assertions.assertThat(url.password()).isEmpty();
-    Assertions.assertThat(url.pathname()).isEqualTo("/path1");
-    Assertions.assertThat(url.port()).isEqualTo("");
-    Assertions.assertThat(url.protocol()).isEqualTo("http:");
-    Assertions.assertThat(url.search()).isEqualTo("?a=1&b=2");
-    Assertions.assertThat(url.searchParams()).isNotNull();
-    Assertions.assertThat(url.searchParams().size()).isEqualTo(2);
-    Assertions.assertThat(url.username()).isEmpty();
+    System.out.println(url.hash());         // #hash1
+    System.out.println(url.host());         // www.myurl.com 
+    System.out.println(url.hostname());     // www.myurl.com
+    System.out.println(url.href());         // http://www.myurl.com/path1?a=1&b=2#hash1
+    System.out.println(url.origin());       // http://www.myurl.com
+    System.out.println(url.password());     // 
+    System.out.println(url.pathname());     // /path1
+    System.out.println(url.port());         //
+    System.out.println(url.protocol());     // http
+    System.out.println(url.search());       // ?a=1&b=2
+    System.out.println(url.searchParams()); // a=1&b=2
+    System.out.println(url.username());     // 
 }
 ```
 
@@ -49,20 +108,18 @@ import org.assertj.core.api.Assertions;
 
 public void parseRelativeUrl() {
     Url url = Url.create("path1?a=1&b=2#hash1", "http://www.myurl.com/path2?c=3&d=2#hash2");
-    Assertions.assertThat(url).isNotNull();
-    Assertions.assertThat(url.hash()).isEqualTo("#hash1");
-    Assertions.assertThat(url.host()).isEqualTo("www.myurl.com");
-    Assertions.assertThat(url.hostname()).isEqualTo("www.myurl.com");
-    Assertions.assertThat(url.href()).isEqualTo("http://www.myurl.com/path1?a=1&b=2#hash1");
-    Assertions.assertThat(url.origin()).isEqualTo("http://www.myurl.com");
-    Assertions.assertThat(url.password()).isEmpty();
-    Assertions.assertThat(url.pathname()).isEqualTo("/path1");
-    Assertions.assertThat(url.port()).isEqualTo("");
-    Assertions.assertThat(url.protocol()).isEqualTo("http:");
-    Assertions.assertThat(url.search()).isEqualTo("?a=1&b=2");
-    Assertions.assertThat(url.searchParams()).isNotNull();
-    Assertions.assertThat(url.searchParams().size()).isEqualTo(2);
-    Assertions.assertThat(url.username()).isEmpty();
+    System.out.println(url.hash());         // #hash1
+    System.out.println(url.host());         // www.myurl.com 
+    System.out.println(url.hostname());     // www.myurl.com
+    System.out.println(url.href());         // http://www.myurl.com/path1?a=1&b=2#hash1
+    System.out.println(url.origin());       // http://www.myurl.com
+    System.out.println(url.password());     // 
+    System.out.println(url.pathname());     // /path1
+    System.out.println(url.port());         //
+    System.out.println(url.protocol());     // http
+    System.out.println(url.search());       // ?a=1&b=2
+    System.out.println(url.searchParams()); // a=1&b=2
+    System.out.println(url.username());     // 
 }
 ```
 
@@ -73,20 +130,21 @@ import org.assertj.core.api.Assertions;
 
 public void setProperties() {
     Url url = Url.create("http://www.myurl.com/path1?a=1&b=2#hash1");
-    Assertions.assertThat(url.hash()).isEqualTo("#hash1");
+    // hash
+    System.out.println(url.hash());         // #hash1
     url.hash("hash2");
-    Assertions.assertThat(url.hash()).isEqualTo("#hash2");
-    Assertions.assertThat(url.host()).isEqualTo("www.myurl.com");
+    System.out.println(url.hash());         // #hash2
+    // host
+    System.out.println(url.host());         // www.myurl.com
     url.host("anotherhost.io");
-    Assertions.assertThat(url.host()).isEqualTo("anotherhost.io");
-    // set other properties such as username, password, pathname, port,protocol, etc.
+    System.out.println(url.host());         // anotherhost.io
+    // set other properties such as username, password, pathname, port, protocol, etc.
 }
 
 ```
 
 # Build information
-Gradle is the build system used by the project. A couple of commands:
-
+Gradle is the build system used by the project. A couple of useful commands:
 
 `./gradlew assemble` to build the jar
 
