@@ -62,6 +62,7 @@ public interface Url {
    *
    * @param input the input to parse and create an Url from
    * @return a new Url
+   * @exception ValidationException if the parse returns a failure
    */
   static Url create(String input) {
     return create(input, null);
@@ -73,6 +74,7 @@ public interface Url {
    * @param input the input to parse and create an Url from
    * @param baseUrl the base url
    * @return a new Url
+   * @exception ValidationException if the parse returns a failure
    */
   static Url create(String input, String baseUrl) {
     return UrlImpl.create(input, baseUrl);
@@ -87,7 +89,7 @@ public interface Url {
   String hash();
 
   /**
-   * Sets the hash property.
+   * Set the hash property.
    *
    * @param value the hash to set
    * @return a reference to this to support a fluent api
