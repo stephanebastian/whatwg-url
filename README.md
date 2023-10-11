@@ -4,19 +4,19 @@ This project is a java implementation of the <a target="_blank" href="https://ur
 
 It is in sync with <a target="_blank" href="https://github.com/whatwg/url/commit/aa64bb27d427cef0d87f134980ac762cced1f5bb">this specific commit (27 September 2023)</a>.
 
-The library is pretty slim (~50k), works with Java 8 and up, and has only one dependency (on <a target="_blank" href="https://unicode-org.github.io/icu/userguide/icu4j/">ICU</a>.
+The library is rather slim (~55k), works with Java 8 and up, and has only one dependency (on <a target="_blank" href="https://unicode-org.github.io/icu/userguide/icu4j/">ICU</a>.
 Tests coverage is pretty good (3000+ tests). Some test data are borrowed from <a target="_blank" href="https://github.com/web-platform-tests/wpt/tree/master/url/resources/">Web-Platform</a>, the cross-browser test suite (Safari, Chrome, Firefox, Edge...)). 
 As a side note, there is a basic benchmark (built with jmh) that iterates over 500+ 'typical' urls and measures the throughput (350000 ops/s on an AMD Ryzen 5, but your mileage may vary)
 For the more adventurous/curious, the interesting bits live in the class UrlParser and is based on a state machine.
 
 For the record, I started this project years ago and used it in several projects. I always wanted to open-source it, but never got the time to do it properly. This is long overdue, and I hope you'll find it useful.
 
-You are obviously more than welcome to provide feedback, report issue and... provide pull requests ! :)
+You are obviously more than welcome to provide feedback, report issues and... provide pull requests ! :)
 
 # Java API
 
 The Java API closely follows <a target="_blank" href="https://url.spec.whatwg.org/#api">WhatWg API</a>. 
-Note that both create methods may throw a ValidationException. However, calling a setter with a bad value does *not* thrown an exception but report them in the method validationErrors()
+Note that 'create methods' may throw a ValidationException. However, calling a setter with a bad value does *not* throw an exception but report them in the method validationErrors()
 
 ```
 public interface Url {
