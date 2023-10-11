@@ -74,7 +74,6 @@ public enum ValidationError {
   public String description();
   public boolean isFailure();
 }
-
 ```
 
 # Usage
@@ -142,18 +141,17 @@ public void setProperties() {
     System.out.println(url.host());         // anotherhost.io
     // set other properties such as username, password, pathname, port, protocol, etc.
 }
-
 ```
 
 ## How to get validation errors?
 
-The specification defines the notion of ValidationError, which can be 'regular' errors or 'failures'.
-Regular errors **and** failures are available by calling the method Url.validationErrors(). 
+The specification defines <a href="https://url.spec.whatwg.org/#validation-error">ValidationError</a>. A validationError doesn't stop processing the url unless it's a failure.
 
 If a failure occurs when calling `Url.create("http://www.myurl.com")`, or `Url.create("abc", "http://www.baseUrl.com")`
-a ValidationException is thrown.
-If a failure occurs when calling a setter, an exception is **not thrown**, and the ValidationError 
-that caused the failure is added to Url.validationErrors().
+a ValidationException is thrown. 
+
+However, if a failure occurs when calling a setter, an exception is **not thrown**, but the ValidationError
+is added to Url.validationErrors().
 
 ```
 import io.github.stephanebastian.whatwg.url.Url;
@@ -164,7 +162,6 @@ public void readValidationErrors() {
     // hash
     System.out.println(url.hash());         // #hash1
 }
-
 ```
 
 # Build information
