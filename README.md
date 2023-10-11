@@ -1,11 +1,11 @@
 # Java implementation of WhatWg URL Living Standard
 
-This project is a java implementation of the [WhatWg specification](https://url.spec.whatwg.org/) - The main advantage of the WhatWg Url standard is that it fixes the various shortcomings and quirks of java.net.URL, RFC3986 and RFC3987, etc.
+This project is a java implementation of the <a target="_blank" href="https://url.spec.whatwg.org/">WhatWg specification</a> - The main advantage of the WhatWg Url standard is that it fixes the various shortcomings and quirks of java.net.URL, RFC3986 and RFC3987, etc.
 
-It is in sync with [this specific commit (27 September 2023)](https://github.com/whatwg/url/commit/aa64bb27d427cef0d87f134980ac762cced1f5bb).
+It is in sync with <a target="_blank" href="https://github.com/whatwg/url/commit/aa64bb27d427cef0d87f134980ac762cced1f5bb">this specific commit (27 September 2023)</a>.
 
-The library is pretty slim (~50k), works with Java 8 and up, and has only one dependency (on [ICU](https://unicode-org.github.io/icu/userguide/icu4j/)).
-Tests coverage is pretty good (3000+ tests). Some test data are borrowed from [Web-Platform](https://github.com/web-platform-tests/wpt/tree/master/url/resources/), the cross-browser test suite (Safari, Chrome, Firefox, Edge...)). 
+The library is pretty slim (~50k), works with Java 8 and up, and has only one dependency (on <a target="_blank" href="https://unicode-org.github.io/icu/userguide/icu4j/">ICU</a>.
+Tests coverage is pretty good (3000+ tests). Some test data are borrowed from <a target="_blank" href="https://github.com/web-platform-tests/wpt/tree/master/url/resources/">Web-Platform</a>, the cross-browser test suite (Safari, Chrome, Firefox, Edge...)). 
 As a side note, there is a basic benchmark (built with jmh) that iterates over 500+ 'typical' urls and measures the throughput (350000 ops/s on an AMD Ryzen 5, but your mileage may vary)
 For the more adventurous/curious, the interesting bits live in the class UrlParser and is based on a state machine.
 
@@ -15,7 +15,7 @@ You are obviously more than welcome to provide feedback, report issue and... pro
 
 # Java API
 
-The Java API closely follows [WhatWg API](https://url.spec.whatwg.org/#api). 
+The Java API closely follows <a target="_blank" href="https://url.spec.whatwg.org/#api">WhatWg API</a>. 
 Note that both create methods may throw a ValidationException. However, calling a setter with a bad value does *not* thrown an exception but report them in the method validationErrors()
 
 ```
@@ -145,7 +145,7 @@ public void setProperties() {
 
 ## How to get validation errors?
 
-The specification defines <a href="https://url.spec.whatwg.org/#validation-error">ValidationError</a>. A validationError doesn't stop processing the url unless it's a failure.
+The specification defines <a target="_blank" href="https://url.spec.whatwg.org/#validation-error">ValidationError</a>. A validationError doesn't stop processing the url unless it's a failure.
 
 If a failure occurs when calling `Url.create("http://www.myurl.com")`, or `Url.create("abc", "http://www.baseUrl.com")`
 a ValidationException is thrown. 
