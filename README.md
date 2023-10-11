@@ -150,7 +150,7 @@ public void setProperties() {
 The specification defines the notion of ValidationError, which can be 'regular' errors or 'failures'.
 Regular errors **and** failures are available by calling the method Url.validationErrors(). 
 
-If a failure occurs when calling Url.create("http://www.myurl.com"), or Url.create("abc", "http://www.baseUrl.com")
+If a failure occurs when calling `Url.create("http://www.myurl.com")`, or `Url.create("abc", "http://www.baseUrl.com")`
 a ValidationException is thrown.
 If a failure occurs when calling a setter, an exception is **not thrown**, and the ValidationError 
 that caused the failure is added to Url.validationErrors().
