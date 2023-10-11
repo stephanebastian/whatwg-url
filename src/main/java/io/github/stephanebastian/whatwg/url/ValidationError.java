@@ -175,18 +175,7 @@ true),
  "A file: URL’s host is a Windows drive letter.\n"
        + "\n"
        + "\"file://c:\" ",
- false),
-  _INVALID_SCHEME(
- "The scheme is invalid",
- true),
-  _IPV4_NUMBER_PARSER(
- "The input can't be parsed to an IPV4 number - Note that this exception is not defined by the WhatWg specification.\n"
-       + "\n"
-       + "\"file://c:\" ",
- true),
-  _SEARCH_PARAMS_INIT(
- "Search parameters can´t be instantiated",
- true);
+ false);
   // @formatter:on
   private final String description;
   private final boolean isFailure;

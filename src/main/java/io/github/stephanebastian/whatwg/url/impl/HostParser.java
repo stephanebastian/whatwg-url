@@ -283,7 +283,7 @@ public class HostParser {
     Objects.requireNonNull(input);
     // 1
     if (input.isEmpty()) {
-      throw new ValidationException(ValidationError._IPV4_NUMBER_PARSER);
+      throw new RuntimeException("Expecting non empty string");
     }
     // 2
     boolean validationError = false;
@@ -314,17 +314,13 @@ public class HostParser {
     // 7
     for (int i = 0; i < input.length(); i++) {
       if (Character.digit(input.codePointAt(i), radix) == -1) {
-        throw new ValidationException(ValidationError._IPV4_NUMBER_PARSER);
+        throw new RuntimeException("The codepoint is not a radix R digit");
       }
     }
-    try {
-      // 8
-      int output = Integer.parseUnsignedInt(input, radix);
-      // 9
-      return new AbstractMap.SimpleEntry<Integer, Boolean>(output, validationError);
-    } catch (Throwable t) {
-      throw new ValidationException(ValidationError._IPV4_NUMBER_PARSER);
-    }
+    // 8
+    int output = Integer.parseUnsignedInt(input, radix);
+    // 9
+    return new AbstractMap.SimpleEntry<Integer, Boolean>(output, validationError);
   }
 
   /**

@@ -4,7 +4,7 @@ This project is a java implementation of the [WhatWg specification](https://url.
 
 It is in sync with [this specific commit (27 September 2023)](https://github.com/whatwg/url/commit/aa64bb27d427cef0d87f134980ac762cced1f5bb).
 
-The library is pretty slim (~50k), works with Java 8 and up, and only has a dependency on [ICU](https://unicode-org.github.io/icu/userguide/icu4j/).
+The library is pretty slim (~50k), works with Java 8 and up, and has only one dependency (on [ICU](https://unicode-org.github.io/icu/userguide/icu4j/)).
 Tests coverage is pretty good (3000+ tests). Some test data are borrowed from [Web-Platform](https://github.com/web-platform-tests/wpt/tree/master/url/resources/), the cross-browser test suite (Safari, Chrome, Firefox, Edge...)). 
 As a side note, there is a basic benchmark (built with jmh) that iterates over 500+ 'typical' urls and measures the throughput (350000 ops/s on an AMD Ryzen 5, but your mileage may vary)
 For the more adventurous/curious, the interesting bits live in the class UrlParser and is based on a state machine.
@@ -49,7 +49,8 @@ public interface Url {
   String toJSON();
   String username();
   Url username(String value);
-  // not in the spec, but very useful to list validation errors when parsing the initial raw url or when setting properties.
+  // not in the spec, but very useful to list validation errors when parsing 
+  // the initial raw url or when setting properties.
   Collection<ValidationError> validationErrors();
 }
 
@@ -77,7 +78,8 @@ public enum ValidationError {
 ```
 
 # Usage
-Typical code to parse a url
+
+## Example code to parse a url
 
 ```
 import io.github.stephanebastian.whatwg.url.Url;
@@ -100,7 +102,7 @@ public void parseUrl() {
 }
 ```
 
-Typical code to parse a relative url
+## Example code to parse a relative url
 
 ```
 import io.github.stephanebastian.whatwg.url.Url;
@@ -123,7 +125,7 @@ public void parseRelativeUrl() {
 }
 ```
 
-Set properties
+## Example code to set properties
 ```
 import io.github.stephanebastian.whatwg.url.Url;
 import org.assertj.core.api.Assertions;
@@ -139,6 +141,28 @@ public void setProperties() {
     url.host("anotherhost.io");
     System.out.println(url.host());         // anotherhost.io
     // set other properties such as username, password, pathname, port, protocol, etc.
+}
+
+```
+
+## How to get validation errors?
+
+The specification defines the notion of ValidationError, which can be 'regular' errors or 'failures'.
+Regular errors **and** failures are available by calling the method Url.validationErrors(). 
+
+If a failure occurs when calling Url.create("http://www.myurl.com"), or Url.create("abc", "http://www.baseUrl.com")
+a ValidationException is thrown.
+If a failure occurs when calling a setter, an exception is **not thrown**, and the ValidationError 
+that caused the failure is added to Url.validationErrors().
+
+```
+import io.github.stephanebastian.whatwg.url.Url;
+import org.assertj.core.api.Assertions;
+
+public void readValidationErrors() {
+    Url url = Url.create("http://www.myurl.com/path1?a=1&b=2#hash1");
+    // hash
+    System.out.println(url.hash());         // #hash1
 }
 
 ```

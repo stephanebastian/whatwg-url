@@ -3,7 +3,6 @@ package io.github.stephanebastian.whatwg.url.impl;
 import io.github.stephanebastian.whatwg.url.Url;
 import io.github.stephanebastian.whatwg.url.UrlSearchParams;
 import io.github.stephanebastian.whatwg.url.ValidationError;
-import io.github.stephanebastian.whatwg.url.ValidationException;
 import io.github.stephanebastian.whatwg.url.impl.UrlParser.State;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
@@ -637,7 +636,7 @@ public class UrlImpl implements Url {
       for (List<String> innerSequence : sequence) {
         // 1
         if (innerSequence.size() != 2) {
-          throw new ValidationException(ValidationError._SEARCH_PARAMS_INIT);
+          throw new RuntimeException("The list must contain 2 items");
         }
         // 2
         append(innerSequence.get(0), innerSequence.get(1));

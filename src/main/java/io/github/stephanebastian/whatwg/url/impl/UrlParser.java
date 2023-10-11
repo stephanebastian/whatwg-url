@@ -496,7 +496,7 @@ class UrlParser {
       }
       // 1.2
       if (input.codepointIs(CodepointHelper.CP_PERCENT)
-          && input.remainingMatch(2, (idx, cp) -> InfraHelper.isAsciiHexDigit(cp))) {
+          && !input.remainingMatch(2, (idx, cp) -> InfraHelper.isAsciiHexDigit(cp))) {
         validationError(ValidationError.INVALID_URL_UNIT);
       }
       // 1.3
@@ -1206,7 +1206,7 @@ class UrlParser {
       return StateReturnType.CONTINUE;
     }
     // 3
-    throw validationException(ValidationError._INVALID_SCHEME);
+    throw validationException(ValidationError.INVALID_URL_UNIT);
   }
 
   /**
@@ -1341,7 +1341,7 @@ class UrlParser {
       return StateReturnType.CONTINUE;
     }
     // 4
-    throw validationException(ValidationError._INVALID_SCHEME);
+    throw validationException(ValidationError.INVALID_URL_UNIT);
   }
 
   /**
