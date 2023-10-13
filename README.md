@@ -1,6 +1,6 @@
-# Java implementation of WhatWg URL Living Standard
+# Java implementation of WHATWG URL Living Standard
 
-This project is a java implementation of the <a target="_blank" href="https://url.spec.whatwg.org/">WhatWg specification</a> - The main advantage of the WhatWg Url standard is that it fixes the various shortcomings and quirks of java.net.URL, RFC3986 and RFC3987, etc.
+This project is a java implementation of the <a target="_blank" href="https://url.spec.whatwg.org/">WHATWG specification</a> - The main advantage of the WHATWG URL standard is that it fixes the various shortcomings and quirks of java.net.URL, RFC3986 and RFC3987, etc.
 
 It is in sync with <a target="_blank" href="https://github.com/whatwg/url/commit/aa64bb27d427cef0d87f134980ac762cced1f5bb">this specific commit (27 September 2023)</a>.
 
@@ -15,7 +15,7 @@ You are obviously more than welcome to provide feedback, report issues and... pr
 
 # Java API
 
-The Java API closely follows <a target="_blank" href="https://url.spec.whatwg.org/#api">WhatWg API</a>. 
+The Java API closely follows <a target="_blank" href="https://url.spec.whatwg.org/#api">WHATWG API</a>. 
 Note that 'create methods' may throw a ValidationException. However, calling a setter with a bad value does *not* throw an exception but report them in the method validationErrors()
 
 ```
